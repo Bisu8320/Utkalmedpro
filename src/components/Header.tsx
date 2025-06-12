@@ -25,7 +25,7 @@ const Header = () => {
               <Heart className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">MediCare Home</h1>
+              <h1 className="text-xl font-bold text-gray-900">Utkal Medpro</h1>
               <p className="text-xs text-gray-500">Paramedical Services</p>
             </div>
           </Link>
@@ -51,7 +51,7 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-primary-600">
               <Phone className="h-4 w-4" />
-              <span className="text-sm font-medium">Emergency: +91 9876543210</span>
+              <span className="text-sm font-medium">Emergency: +91 7064055180</span>
             </div>
             <Link
               to="/booking"
@@ -91,7 +91,7 @@ const Header = () => {
               <div className="pt-4 border-t border-gray-200">
                 <div className="flex items-center space-x-2 text-primary-600 px-3 py-2">
                   <Phone className="h-4 w-4" />
-                  <span className="text-sm font-medium">Emergency: +91 9876543210</span>
+                  <span className="text-sm font-medium">Emergency: +91 7064055180</span>
                 </div>
                 <Link
                   to="/booking"

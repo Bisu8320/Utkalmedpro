@@ -13,7 +13,7 @@ const Footer = () => {
                 <Heart className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">MediCare Home</h3>
+                <h3 className="text-xl font-bold">Utkal Medpro</h3>
                 <p className="text-gray-400 text-sm">Paramedical Services</p>
               </div>
             </div>
@@ -44,11 +44,11 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-primary-400" />
-                <span className="text-gray-300 text-sm">+91 9876543210</span>
+                <span className="text-gray-300 text-sm">+91 7064055180</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-primary-400" />
-                <span className="text-gray-300 text-sm">info@medicarehome.com</span>
+                <span className="text-gray-300 text-sm">info@utkalmedpro.com</span>
               </div>
               <div className="flex items-start space-x-2">
                 <MapPin className="h-4 w-4 text-primary-400 mt-1" />
@@ -64,7 +64,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400 text-sm">
-            © 2024 MediCare Home. All rights reserved. | Licensed Paramedical Services
+            © 2024 Utkal Medpro. All rights reserved. | Licensed Paramedical Services
           </p>
         </div>
       </div>

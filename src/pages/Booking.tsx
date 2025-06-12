@@ -251,11 +251,11 @@ const Booking = () => {
               For urgent medical assistance, call our emergency hotline immediately
             </p>
             <a
-              href="tel:+919876543210"
+              href="tel:+917064055180"
               className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-700 transition-colors inline-flex items-center space-x-2"
             >
               <Phone className="h-5 w-5" />
-              <span>Emergency: +91 9876543210</span>
+              <span>Emergency: +91 7064055180</span>
             </a>
           </div>
         </div>

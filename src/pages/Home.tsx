@@ -97,7 +97,7 @@ const Home = () => {
                   Book Appointment
                 </Link>
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+917064055180"
                   className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-all duration-300 text-center"
                 >
                   Emergency Call
@@ -242,7 +242,7 @@ const Home = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Why Choose MediCare Home?
+                Why Choose Utkal Medpro?
               </h2>
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
@@ -311,7 +311,7 @@ const Home = () => {
               <span>Book Appointment</span>
             </Link>
             <a
-              href="tel:+919876543210"
+              href="tel:+917064055180"
               className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-all duration-300 inline-flex items-center justify-center space-x-2"
             >
               <Phone className="h-5 w-5" />

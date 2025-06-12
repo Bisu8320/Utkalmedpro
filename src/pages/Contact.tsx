@@ -36,18 +36,18 @@ const Contact = () => {
       icon: Phone,
       title: 'Phone Numbers',
       details: [
-        { label: 'Main Line', value: '+91 9876543210' },
-        { label: 'Emergency', value: '+91 9876543211' },
-        { label: 'WhatsApp', value: '+91 9876543212' }
+        { label: 'Main Line', value: '+91 7064055180' },
+        { label: 'Emergency', value: '+91 7064055180' },
+        { label: 'WhatsApp', value: '+91 7064055180' }
       ]
     },
     {
       icon: Mail,
       title: 'Email Addresses',
       details: [
-        { label: 'General Inquiries', value: 'info@medicarehome.com' },
-        { label: 'Bookings', value: 'booking@medicarehome.com' },
-        { label: 'Emergency', value: 'emergency@medicarehome.com' }
+        { label: 'General Inquiries', value: 'info@utkalmedpro.com' },
+        { label: 'Bookings', value: 'booking@utkalmedpro.com' },
+        { label: 'Emergency', value: 'emergency@utkalmedpro.com' }
       ]
     },
     {
@@ -161,7 +161,7 @@ const Contact = () => {
                       onChange={handleInputChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="+91 9876543210"
+                      placeholder="+91 7064055180"
                     />
                   </div>
                 </div>
@@ -253,18 +253,18 @@ const Contact = () => {
               {/* Quick Contact Options */}
               <div className="space-y-4">
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+917064055180"
                   className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
                 >
                   <Phone className="h-6 w-6 text-green-600" />
                   <div>
                     <p className="font-semibold text-gray-900">Call Now</p>
-                    <p className="text-sm text-gray-600">+91 9876543210</p>
+                    <p className="text-sm text-gray-600">+91 7064055180</p>
                   </div>
                 </a>
 
                 <a
-                  href="https://wa.me/919876543212"
+                  href="https://wa.me/917064055180"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
@@ -277,13 +277,13 @@ const Contact = () => {
                 </a>
 
                 <a
-                  href="mailto:info@medicarehome.com"
+                  href="mailto:info@utkalmedpro.com"
                   className="flex items-center space-x-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
                 >
                   <Mail className="h-6 w-6 text-purple-600" />
                   <div>
                     <p className="font-semibold text-gray-900">Email Us</p>
-                    <p className="text-sm text-gray-600">info@medicarehome.com</p>
+                    <p className="text-sm text-gray-600">info@utkalmedpro.com</p>
                   </div>
                 </a>
               </div>
@@ -303,14 +303,14 @@ const Contact = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="tel:+919876543211"
+                href="tel:+917064055180"
                 className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-700 transition-colors inline-flex items-center justify-center space-x-2"
               >
                 <Phone className="h-5 w-5" />
-                <span>Emergency: +91 9876543211</span>
+                <span>Emergency: +91 7064055180</span>
               </a>
               <a
-                href="https://wa.me/919876543211"
+                href="https://wa.me/917064055180"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors inline-flex items-center justify-center space-x-2"

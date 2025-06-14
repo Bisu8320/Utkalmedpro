@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Phone, Mail, MapPin, Clock, Send, MessageCircle } from 'lucide-react'
+import { saveContactMessage } from '../utils/storage'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -20,7 +21,7 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Contact form submitted:', formData)
+    saveContactMessage(formData)
     alert('Thank you for your message! We will get back to you within 24 hours.')
     setFormData({
       name: '',

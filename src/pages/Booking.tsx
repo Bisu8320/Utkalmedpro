@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Calendar, Clock, MapPin, User, Phone, Mail, FileText } from 'lucide-react'
+import { saveBooking } from '../utils/storage'
 
 const Booking = () => {
   const [formData, setFormData] = useState({
@@ -38,9 +39,28 @@ const Booking = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log('Booking submitted:', formData)
+    
+    const selectedService = services.find(s => s.value === formData.service)
+    const bookingData = {
+      ...formData,
+      service: selectedService?.label || formData.service,
+      price: selectedService?.price || 'N/A'
+    }
+    
+    saveBooking(bookingData)
     alert('Booking request submitted successfully! We will contact you shortly to confirm.')
+    
+    // Reset form
+    setFormData({
+      service: '',
+      name: '',
+      phone: '',
+      email: '',
+      address: '',
+      date: '',
+      time: '',
+      notes: ''
+    })
   }
 
   const selectedService = services.find(s => s.value === formData.service)

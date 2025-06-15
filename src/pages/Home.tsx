@@ -45,7 +45,7 @@ const Home = () => {
         'Up to 4 visits per month',
         'Priority booking',
         'Detailed health reports',
-        '24/7 emergency support',
+        'support',
         'Free consultation calls'
       ]
     },

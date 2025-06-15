@@ -23,7 +23,7 @@ const Footer = () => {
             </p>
             <div className="flex items-center space-x-2 text-primary-400">
               <Clock className="h-4 w-4" />
-              <span className="text-sm">Available 24/7 for emergencies</span>
+              <span className="text-sm">Available 6 AM - 10 PM for Contact us.</span>
             </div>
           </div>
 

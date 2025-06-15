@@ -30,10 +30,10 @@ const Home = () => {
       price: 'Worth ₹999 just at ₹499',
       popular: false,
       features: [
-        'Single service visit',
-        'Basic consultation',
-        'Equipment included',
-        'Follow-up call'
+        'Thyroid Function Test',
+        'Complete Blood Count',
+        'Calcium',
+        'Fasting / Random Blood Sugar'
       ]
     },
     {

@@ -7,7 +7,6 @@ const Services = () => {
     {
       icon: TestTube,
       title: 'Blood Sample Collection',
-      declaration:'Blood sample collected and reported directly by "Relion Diagnostics & Research Center.'
       description: 'Professional blood collection services at your home or office with complete safety protocols.',
       features: [
         'Home and office visits',

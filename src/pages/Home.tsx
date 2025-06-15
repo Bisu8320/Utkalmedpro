@@ -28,7 +28,6 @@ const Home = () => {
     {
       name: 'Womens Health Screening ',
       price: 'Worth ₹999 just at ₹499',
-      period: 'per visit',
       popular: false,
       features: [
         'Single service visit',

@@ -16,7 +16,7 @@ const Services = () => {
         'Multiple test packages available',
         'Fasting and non-fasting tests'
       ],
-      price: 'Starting from ₹299',
+      price: 'Free Home Visit Collection',
       image: 'https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=600'
     },
     {

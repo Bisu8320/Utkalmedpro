@@ -26,8 +26,8 @@ const Home = () => {
 
   const packages = [
     {
-      name: 'Basic Care',
-      price: '₹99',
+      name: 'Womens Health Screening ',
+      price: 'Worth ₹999 just at ₹499',
       period: 'per visit',
       popular: false,
       features: [

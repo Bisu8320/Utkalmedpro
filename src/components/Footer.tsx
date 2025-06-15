@@ -53,9 +53,9 @@ const Footer = () => {
               <div className="flex items-start space-x-2">
                 <MapPin className="h-4 w-4 text-primary-400 mt-1" />
                 <span className="text-gray-300 text-sm">
-                  123 Healthcare Street,<br />
-                  Medical District,<br />
-                  City - 123456
+                  office- Taraboi,<br />
+                  Near Indian oil petrol pump,<br />
+                  Khordha - 752050
                 </span>
               </div>
             </div>

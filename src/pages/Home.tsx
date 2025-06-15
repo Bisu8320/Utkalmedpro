@@ -27,7 +27,7 @@ const Home = () => {
   const packages = [
     {
       name: 'Womens Health Screening ',
-      price: 'Worth with cross ₹999 just at ₹499',
+      price: 'Worth ₹999 just at ₹499',
       popular: false,
       features: [
         'Single service visit',

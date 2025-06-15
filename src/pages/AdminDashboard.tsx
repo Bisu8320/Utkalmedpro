@@ -14,7 +14,6 @@ import {
   Trash2,
   Phone,
   Mail,
-  MapPin,
   Clock
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'

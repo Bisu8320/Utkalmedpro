@@ -1,4 +1,3 @@
-import React from 'react'
 import { Heart, Phone, Mail, MapPin, Clock } from 'lucide-react'
 
 const Footer = () => {

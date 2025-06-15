@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Tag } from 'lucide-react'
 import { getOffers } from '../utils/storage'
 import { Offer } from '../types'

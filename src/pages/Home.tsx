@@ -68,7 +68,7 @@ const Home = () => {
 
   const stats = [
     { number: '500+', label: 'Happy Patients' },
-    { number: '6 AM TO 10 PM', label: 'Available' },
+    { number: '6 AM-10 PM', label: 'Available' },
     { number: '2+', label: 'Years Experience' },
     { number: '100%', label: 'Satisfaction Rate' }
   ]

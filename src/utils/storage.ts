@@ -6,7 +6,7 @@ const OFFERS_KEY = 'utkal_medpro_offers'
 const MESSAGES_KEY = 'utkal_medpro_messages'
 
 // Booking functions
-export const saveBooking = (booking: Omit<Booking, 'id' | 'createdAt'>): Booking => {
+export const saveBooking = (booking: Omit<Booking, 'id' |'status'| 'createdAt'>): Booking => {
   const bookings = getBookings()
   const newBooking: Booking = {
     ...booking,

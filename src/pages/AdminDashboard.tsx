@@ -14,7 +14,8 @@ import {
   Trash2,
   Phone,
   Mail,
-  Clock
+  Clock,
+  RefreshCw
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { 
@@ -25,7 +26,12 @@ import {
   updateOffer, 
   deleteOffer,
   getContactMessages,
-  updateMessageStatus
+  updateMessageStatus,
+  addStorageListener,
+  removeStorageListener,
+  BOOKINGS_KEY,
+  OFFERS_KEY,
+  MESSAGES_KEY
 } from '../utils/storage'
 import { Booking, Offer, ContactMessage } from '../types'
 
@@ -37,6 +43,7 @@ const AdminDashboard = () => {
   const [messages, setMessages] = useState<ContactMessage[]>([])
   const [showOfferForm, setShowOfferForm] = useState(false)
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null)
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
 
   const [offerForm, setOfferForm] = useState({
     title: '',
@@ -49,6 +56,38 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (isAuthenticated) {
       loadData()
+      
+      // Set up real-time listeners
+      const handleBookingsUpdate = () => {
+        setBookings(getBookings())
+        setLastUpdate(new Date())
+      }
+      
+      const handleOffersUpdate = () => {
+        setOffers(getOffers())
+        setLastUpdate(new Date())
+      }
+      
+      const handleMessagesUpdate = () => {
+        setMessages(getContactMessages())
+        setLastUpdate(new Date())
+      }
+
+      addStorageListener(BOOKINGS_KEY, handleBookingsUpdate)
+      addStorageListener(OFFERS_KEY, handleOffersUpdate)
+      addStorageListener(MESSAGES_KEY, handleMessagesUpdate)
+
+      // Auto-refresh every 30 seconds
+      const interval = setInterval(() => {
+        loadData()
+      }, 30000)
+
+      return () => {
+        removeStorageListener(BOOKINGS_KEY, handleBookingsUpdate)
+        removeStorageListener(OFFERS_KEY, handleOffersUpdate)
+        removeStorageListener(MESSAGES_KEY, handleMessagesUpdate)
+        clearInterval(interval)
+      }
     }
   }, [isAuthenticated])
 
@@ -56,6 +95,7 @@ const AdminDashboard = () => {
     setBookings(getBookings())
     setOffers(getOffers())
     setMessages(getContactMessages())
+    setLastUpdate(new Date())
   }
 
   if (!isAuthenticated) {
@@ -64,12 +104,12 @@ const AdminDashboard = () => {
 
   const handleBookingStatusUpdate = (id: string, status: Booking['status']) => {
     updateBookingStatus(id, status)
-    loadData()
+    // Data will be updated automatically via listeners
   }
 
   const handleMessageStatusUpdate = (id: string, status: ContactMessage['status']) => {
     updateMessageStatus(id, status)
-    loadData()
+    // Data will be updated automatically via listeners
   }
 
   const handleOfferSubmit = (e: React.FormEvent) => {
@@ -82,7 +122,7 @@ const AdminDashboard = () => {
     }
     setOfferForm({ title: '', description: '', discount: '', validUntil: '', isActive: true })
     setShowOfferForm(false)
-    loadData()
+    // Data will be updated automatically via listeners
   }
 
   const handleEditOffer = (offer: Offer) => {
@@ -100,7 +140,7 @@ const AdminDashboard = () => {
   const handleDeleteOffer = (id: string) => {
     if (confirm('Are you sure you want to delete this offer?')) {
       deleteOffer(id)
-      loadData()
+      // Data will be updated automatically via listeners
     }
   }
 
@@ -133,13 +173,25 @@ const AdminDashboard = () => {
               <h1 className="text-2xl font-bold text-gray-900">Utkal Medpro Admin</h1>
               <p className="text-gray-600">Dashboard & Management</p>
             </div>
-            <button
-              onClick={logout}
-              className="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors"
-            >
-              <LogOut className="h-5 w-5" />
-              <span>Logout</span>
-            </button>
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-500">
+                Last updated: {lastUpdate.toLocaleTimeString()}
+              </div>
+              <button
+                onClick={loadData}
+                className="p-2 text-gray-600 hover:text-primary-600 transition-colors"
+                title="Refresh data"
+              >
+                <RefreshCw className="h-5 w-5" />
+              </button>
+              <button
+                onClick={logout}
+                className="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors"
+              >
+                <LogOut className="h-5 w-5" />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -191,6 +243,21 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* Real-time indicator */}
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm text-gray-600">Live updates enabled</span>
+          </div>
+          <div className="text-sm text-gray-500">
+            {bookings.filter(b => b.status === 'pending').length > 0 && (
+              <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                {bookings.filter(b => b.status === 'pending').length} pending bookings need attention
+              </span>
+            )}
+          </div>
+        </div>
+
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow">
           <div className="border-b border-gray-200">
@@ -208,7 +275,9 @@ const AdminDashboard = () => {
                   <tab.icon className="h-5 w-5" />
                   <span>{tab.label}</span>
                   {tab.count > 0 && (
-                    <span className="bg-gray-100 text-gray-900 py-0.5 px-2 rounded-full text-xs">
+                    <span className={`py-0.5 px-2 rounded-full text-xs ${
+                      activeTab === tab.id ? 'bg-primary-100 text-primary-900' : 'bg-gray-100 text-gray-900'
+                    }`}>
                       {tab.count}
                     </span>
                   )}
@@ -221,91 +290,109 @@ const AdminDashboard = () => {
             {/* Bookings Tab */}
             {activeTab === 'bookings' && (
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Service Bookings</h2>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Customer
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Service
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date & Time
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {bookings.map((booking) => (
-                        <tr key={booking.id}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{booking.name}</div>
-                              <div className="text-sm text-gray-500 flex items-center space-x-4">
-                                <span className="flex items-center">
-                                  <Phone className="h-3 w-3 mr-1" />
-                                  {booking.phone}
-                                </span>
-                                {booking.email && (
-                                  <span className="flex items-center">
-                                    <Mail className="h-3 w-3 mr-1" />
-                                    {booking.email}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{booking.service}</div>
-                            <div className="text-sm text-gray-500">{booking.price}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{booking.date}</div>
-                            <div className="text-sm text-gray-500">{booking.time}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
-                              {booking.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div className="flex space-x-2">
-                              <button
-                                onClick={() => handleBookingStatusUpdate(booking.id, 'confirmed')}
-                                className="text-green-600 hover:text-green-900"
-                                title="Confirm"
-                              >
-                                <Check className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleBookingStatusUpdate(booking.id, 'completed')}
-                                className="text-blue-600 hover:text-blue-900"
-                                title="Mark Complete"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleBookingStatusUpdate(booking.id, 'cancelled')}
-                                className="text-red-600 hover:text-red-900"
-                                title="Cancel"
-                              >
-                                <X className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Service Bookings</h2>
+                  <div className="text-sm text-gray-500">
+                    {bookings.length === 0 ? 'No bookings yet' : `${bookings.length} total bookings`}
+                  </div>
                 </div>
+                
+                {bookings.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
+                    <p className="text-gray-600">New bookings will appear here automatically when customers book services.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Customer
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Service
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date & Time
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {bookings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((booking) => (
+                          <tr key={booking.id} className={booking.status === 'pending' ? 'bg-yellow-50' : ''}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{booking.name}</div>
+                                <div className="text-sm text-gray-500 flex items-center space-x-4">
+                                  <span className="flex items-center">
+                                    <Phone className="h-3 w-3 mr-1" />
+                                    {booking.phone}
+                                  </span>
+                                  {booking.email && (
+                                    <span className="flex items-center">
+                                      <Mail className="h-3 w-3 mr-1" />
+                                      {booking.email}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{booking.service}</div>
+                              <div className="text-sm text-gray-500">{booking.price}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{booking.date}</div>
+                              <div className="text-sm text-gray-500">{booking.time}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
+                                {booking.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              <div className="flex space-x-2">
+                                {booking.status === 'pending' && (
+                                  <button
+                                    onClick={() => handleBookingStatusUpdate(booking.id, 'confirmed')}
+                                    className="text-green-600 hover:text-green-900"
+                                    title="Confirm"
+                                  >
+                                    <Check className="h-4 w-4" />
+                                  </button>
+                                )}
+                                {booking.status === 'confirmed' && (
+                                  <button
+                                    onClick={() => handleBookingStatusUpdate(booking.id, 'completed')}
+                                    className="text-blue-600 hover:text-blue-900"
+                                    title="Mark Complete"
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleBookingStatusUpdate(booking.id, 'cancelled')}
+                                  className="text-red-600 hover:text-red-900"
+                                  title="Cancel"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
 
@@ -314,8 +401,8 @@ const AdminDashboard = () => {
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Messages</h2>
                 <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div key={message.id} className="bg-gray-50 p-4 rounded-lg">
+                  {messages.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((message) => (
+                    <div key={message.id} className={`p-4 rounded-lg ${message.status === 'new' ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'}`}>
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h3 className="font-semibold text-gray-900">{message.name}</h3>

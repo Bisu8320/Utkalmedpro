@@ -5,6 +5,31 @@ const BOOKINGS_KEY = 'utkal_medpro_bookings'
 const OFFERS_KEY = 'utkal_medpro_offers'
 const MESSAGES_KEY = 'utkal_medpro_messages'
 
+// Event listeners for storage changes
+const storageListeners: { [key: string]: (() => void)[] } = {}
+
+// Add storage event listener
+export const addStorageListener = (key: string, callback: () => void) => {
+  if (!storageListeners[key]) {
+    storageListeners[key] = []
+  }
+  storageListeners[key].push(callback)
+}
+
+// Remove storage event listener
+export const removeStorageListener = (key: string, callback: () => void) => {
+  if (storageListeners[key]) {
+    storageListeners[key] = storageListeners[key].filter(cb => cb !== callback)
+  }
+}
+
+// Notify listeners when storage changes
+const notifyListeners = (key: string) => {
+  if (storageListeners[key]) {
+    storageListeners[key].forEach(callback => callback())
+  }
+}
+
 // Initialize with sample data if empty
 export const initializeSampleData = () => {
   // Check if data already exists to avoid overwriting
@@ -125,6 +150,7 @@ export const saveBooking = (booking: Omit<Booking, 'id' |'status'| 'createdAt'>)
   }
   bookings.push(newBooking)
   localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
+  notifyListeners(BOOKINGS_KEY)
   return newBooking
 }
 
@@ -139,6 +165,7 @@ export const updateBookingStatus = (id: string, status: Booking['status']): void
   if (index !== -1) {
     bookings[index].status = status
     localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
+    notifyListeners(BOOKINGS_KEY)
   }
 }
 
@@ -152,6 +179,7 @@ export const saveOffer = (offer: Omit<Offer, 'id' | 'createdAt'>): Offer => {
   }
   offers.push(newOffer)
   localStorage.setItem(OFFERS_KEY, JSON.stringify(offers))
+  notifyListeners(OFFERS_KEY)
   return newOffer
 }
 
@@ -166,6 +194,7 @@ export const updateOffer = (id: string, updates: Partial<Offer>): void => {
   if (index !== -1) {
     offers[index] = { ...offers[index], ...updates }
     localStorage.setItem(OFFERS_KEY, JSON.stringify(offers))
+    notifyListeners(OFFERS_KEY)
   }
 }
 
@@ -173,6 +202,7 @@ export const deleteOffer = (id: string): void => {
   const offers = getOffers()
   const filtered = offers.filter(o => o.id !== id)
   localStorage.setItem(OFFERS_KEY, JSON.stringify(filtered))
+  notifyListeners(OFFERS_KEY)
 }
 
 // Contact message functions
@@ -186,6 +216,7 @@ export const saveContactMessage = (message: Omit<ContactMessage, 'id' | 'created
   }
   messages.push(newMessage)
   localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages))
+  notifyListeners(MESSAGES_KEY)
   return newMessage
 }
 
@@ -200,5 +231,9 @@ export const updateMessageStatus = (id: string, status: ContactMessage['status']
   if (index !== -1) {
     messages[index].status = status
     localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages))
+    notifyListeners(MESSAGES_KEY)
   }
 }
+
+// Storage keys for listeners
+export { BOOKINGS_KEY, OFFERS_KEY, MESSAGES_KEY }

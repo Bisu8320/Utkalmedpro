@@ -1,8 +1,28 @@
-// import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Syringe, TestTube, Ban as Bandage, Clock, Shield, Users, Star, CheckCircle, Phone, Calendar } from 'lucide-react'
+import DisclaimerModal from '../components/DisclaimerModal'
 
 const Home = () => {
+  const [showDisclaimer, setShowDisclaimer] = useState(false)
+
+  useEffect(() => {
+    // Check if user has already seen the disclaimer
+    const hasSeenDisclaimer = localStorage.getItem('utkal_medpro_disclaimer_seen')
+    if (!hasSeenDisclaimer) {
+      // Show disclaimer after a short delay
+      const timer = setTimeout(() => {
+        setShowDisclaimer(true)
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  const handleDisclaimerClose = () => {
+    setShowDisclaimer(false)
+    localStorage.setItem('utkal_medpro_disclaimer_seen', 'true')
+  }
+
   const services = [
     {
       icon: TestTube,
@@ -74,6 +94,9 @@ const Home = () => {
 
   return (
     <div>
+      {/* Disclaimer Modal */}
+      <DisclaimerModal isOpen={showDisclaimer} onClose={handleDisclaimerClose} />
+
       {/* Hero Section */}
       <section className="gradient-bg text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

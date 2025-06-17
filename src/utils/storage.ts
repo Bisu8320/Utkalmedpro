@@ -26,7 +26,13 @@ export const removeStorageListener = (key: string, callback: () => void) => {
 // Notify listeners when storage changes
 const notifyListeners = (key: string) => {
   if (storageListeners[key]) {
-    storageListeners[key].forEach(callback => callback())
+    storageListeners[key].forEach(callback => {
+      try {
+        callback()
+      } catch (error) {
+        console.error('Error in storage listener:', error)
+      }
+    })
   }
 }
 
@@ -141,97 +147,148 @@ export const initializeSampleData = () => {
 
 // Booking functions
 export const saveBooking = (booking: Omit<Booking, 'id' |'status'| 'createdAt'>): Booking => {
-  const bookings = getBookings()
-  const newBooking: Booking = {
-    ...booking,
-    id: Date.now().toString(),
-    createdAt: new Date().toISOString(),
-    status: 'pending'
+  try {
+    const bookings = getBookings()
+    const newBooking: Booking = {
+      ...booking,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      status: 'pending'
+    }
+    bookings.push(newBooking)
+    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
+    
+    // Notify listeners after successful save
+    setTimeout(() => {
+      notifyListeners(BOOKINGS_KEY)
+    }, 100)
+    
+    return newBooking
+  } catch (error) {
+    console.error('Error saving booking:', error)
+    throw error
   }
-  bookings.push(newBooking)
-  localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
-  notifyListeners(BOOKINGS_KEY)
-  return newBooking
 }
 
 export const getBookings = (): Booking[] => {
-  const stored = localStorage.getItem(BOOKINGS_KEY)
-  return stored ? JSON.parse(stored) : []
+  try {
+    const stored = localStorage.getItem(BOOKINGS_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch (error) {
+    console.error('Error getting bookings:', error)
+    return []
+  }
 }
 
 export const updateBookingStatus = (id: string, status: Booking['status']): void => {
-  const bookings = getBookings()
-  const index = bookings.findIndex(b => b.id === id)
-  if (index !== -1) {
-    bookings[index].status = status
-    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
-    notifyListeners(BOOKINGS_KEY)
+  try {
+    const bookings = getBookings()
+    const index = bookings.findIndex(b => b.id === id)
+    if (index !== -1) {
+      bookings[index].status = status
+      localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
+      notifyListeners(BOOKINGS_KEY)
+    }
+  } catch (error) {
+    console.error('Error updating booking status:', error)
   }
 }
 
 // Offer functions
 export const saveOffer = (offer: Omit<Offer, 'id' | 'createdAt'>): Offer => {
-  const offers = getOffers()
-  const newOffer: Offer = {
-    ...offer,
-    id: Date.now().toString(),
-    createdAt: new Date().toISOString()
+  try {
+    const offers = getOffers()
+    const newOffer: Offer = {
+      ...offer,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString()
+    }
+    offers.push(newOffer)
+    localStorage.setItem(OFFERS_KEY, JSON.stringify(offers))
+    notifyListeners(OFFERS_KEY)
+    return newOffer
+  } catch (error) {
+    console.error('Error saving offer:', error)
+    throw error
   }
-  offers.push(newOffer)
-  localStorage.setItem(OFFERS_KEY, JSON.stringify(offers))
-  notifyListeners(OFFERS_KEY)
-  return newOffer
 }
 
 export const getOffers = (): Offer[] => {
-  const stored = localStorage.getItem(OFFERS_KEY)
-  return stored ? JSON.parse(stored) : []
+  try {
+    const stored = localStorage.getItem(OFFERS_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch (error) {
+    console.error('Error getting offers:', error)
+    return []
+  }
 }
 
 export const updateOffer = (id: string, updates: Partial<Offer>): void => {
-  const offers = getOffers()
-  const index = offers.findIndex(o => o.id === id)
-  if (index !== -1) {
-    offers[index] = { ...offers[index], ...updates }
-    localStorage.setItem(OFFERS_KEY, JSON.stringify(offers))
-    notifyListeners(OFFERS_KEY)
+  try {
+    const offers = getOffers()
+    const index = offers.findIndex(o => o.id === id)
+    if (index !== -1) {
+      offers[index] = { ...offers[index], ...updates }
+      localStorage.setItem(OFFERS_KEY, JSON.stringify(offers))
+      notifyListeners(OFFERS_KEY)
+    }
+  } catch (error) {
+    console.error('Error updating offer:', error)
   }
 }
 
 export const deleteOffer = (id: string): void => {
-  const offers = getOffers()
-  const filtered = offers.filter(o => o.id !== id)
-  localStorage.setItem(OFFERS_KEY, JSON.stringify(filtered))
-  notifyListeners(OFFERS_KEY)
+  try {
+    const offers = getOffers()
+    const filtered = offers.filter(o => o.id !== id)
+    localStorage.setItem(OFFERS_KEY, JSON.stringify(filtered))
+    notifyListeners(OFFERS_KEY)
+  } catch (error) {
+    console.error('Error deleting offer:', error)
+  }
 }
 
 // Contact message functions
 export const saveContactMessage = (message: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>): ContactMessage => {
-  const messages = getContactMessages()
-  const newMessage: ContactMessage = {
-    ...message,
-    id: Date.now().toString(),
-    createdAt: new Date().toISOString(),
-    status: 'new'
+  try {
+    const messages = getContactMessages()
+    const newMessage: ContactMessage = {
+      ...message,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      status: 'new'
+    }
+    messages.push(newMessage)
+    localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages))
+    notifyListeners(MESSAGES_KEY)
+    return newMessage
+  } catch (error) {
+    console.error('Error saving contact message:', error)
+    throw error
   }
-  messages.push(newMessage)
-  localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages))
-  notifyListeners(MESSAGES_KEY)
-  return newMessage
 }
 
 export const getContactMessages = (): ContactMessage[] => {
-  const stored = localStorage.getItem(MESSAGES_KEY)
-  return stored ? JSON.parse(stored) : []
+  try {
+    const stored = localStorage.getItem(MESSAGES_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch (error) {
+    console.error('Error getting contact messages:', error)
+    return []
+  }
 }
 
 export const updateMessageStatus = (id: string, status: ContactMessage['status']): void => {
-  const messages = getContactMessages()
-  const index = messages.findIndex(m => m.id === id)
-  if (index !== -1) {
-    messages[index].status = status
-    localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages))
-    notifyListeners(MESSAGES_KEY)
+  try {
+    const messages = getContactMessages()
+    const index = messages.findIndex(m => m.id === id)
+    if (index !== -1) {
+      messages[index].status = status
+      localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages))
+      notifyListeners(MESSAGES_KEY)
+    }
+  } catch (error) {
+    console.error('Error updating message status:', error)
   }
 }
 

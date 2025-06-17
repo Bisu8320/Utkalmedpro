@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Calendar, Clock, MapPin, User, Phone, Mail, FileText } from 'lucide-react'
+import { Calendar, Clock, MapPin, User, Phone, Mail, FileText, AlertTriangle } from 'lucide-react'
 import { saveBooking } from '../utils/storage'
 
 const Booking = () => {
@@ -13,6 +13,9 @@ const Booking = () => {
     time: '',
     notes: ''
   })
+
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
 
   const services = [
     { value: 'blood-collection', label: 'Blood Sample Collection', price: '₹299' },
@@ -40,6 +43,11 @@ const Booking = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
+    if (!agreedToTerms) {
+      alert('Please agree to the terms and conditions before booking.')
+      return
+    }
+    
     const selectedService = services.find(s => s.value === formData.service)
     const bookingData = {
       ...formData,
@@ -47,20 +55,26 @@ const Booking = () => {
       price: selectedService?.price || 'N/A'
     }
     
-    saveBooking(bookingData)
-    alert('Booking request submitted successfully! We will contact you shortly to confirm.')
-    
-    // Reset form
-    setFormData({
-      service: '',
-      name: '',
-      phone: '',
-      email: '',
-      address: '',
-      date: '',
-      time: '',
-      notes: ''
-    })
+    try {
+      saveBooking(bookingData)
+      alert('Booking request submitted successfully! We will contact you shortly to confirm.')
+      
+      // Reset form
+      setFormData({
+        service: '',
+        name: '',
+        phone: '',
+        email: '',
+        address: '',
+        date: '',
+        time: '',
+        notes: ''
+      })
+      setAgreedToTerms(false)
+    } catch (error) {
+      console.error('Error saving booking:', error)
+      alert('There was an error submitting your booking. Please try again.')
+    }
   }
 
   const selectedService = services.find(s => s.value === formData.service)
@@ -244,11 +258,59 @@ const Booking = () => {
                   </div>
                 )}
 
+                {/* Terms and Conditions */}
+                <div className="bg-yellow-50 border border-yellow-200 p-6 rounded-lg">
+                  <div className="flex items-start space-x-3">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-yellow-900 mb-2">Terms & Conditions</h3>
+                      <div className="text-sm text-yellow-800 space-y-2">
+                        <p>By booking our services, you acknowledge and agree that:</p>
+                        <ul className="list-disc list-inside space-y-1 ml-4">
+                          <li>Utkal Medpro provides only paramedical services as prescribed by qualified doctors</li>
+                          <li>We do not provide emergency medical services, diagnosis, or medical treatment</li>
+                          <li>All services are rendered under doctor's supervision/prescription</li>
+                          <li>You will provide clear medical instructions from your consulting doctor</li>
+                          <li>Utkal Medpro is not liable for medical complications arising from prescribed services</li>
+                          <li>For medical emergencies, contact hospital/emergency services immediately</li>
+                        </ul>
+                        <button
+                          type="button"
+                          onClick={() => setShowTerms(true)}
+                          className="text-yellow-700 underline hover:text-yellow-900"
+                        >
+                          Read full terms & conditions
+                        </button>
+                      </div>
+                      
+                      <div className="mt-4">
+                        <label className="flex items-start space-x-3">
+                          <input
+                            type="checkbox"
+                            checked={agreedToTerms}
+                            onChange={(e) => setAgreedToTerms(e.target.checked)}
+                            className="mt-1 rounded border-yellow-300 text-yellow-600 focus:ring-yellow-500"
+                            required
+                          />
+                          <span className="text-sm text-yellow-800">
+                            I have read and agree to the terms and conditions, and understand that this is a paramedical service only.
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Submit Button */}
                 <div className="pt-6">
                   <button
                     type="submit"
-                    className="w-full btn-primary text-white py-4 px-6 rounded-lg font-semibold text-lg"
+                    disabled={!agreedToTerms}
+                    className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all ${
+                      agreedToTerms 
+                        ? 'btn-primary text-white hover:shadow-lg' 
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                   >
                     Book Appointment
                   </button>
@@ -261,6 +323,56 @@ const Booking = () => {
           </div>
         </div>
       </section>
+
+      {/* Terms Modal */}
+      {showTerms && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">Terms & Conditions</h2>
+                <button
+                  onClick={() => setShowTerms(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-4 text-sm text-gray-700">
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Service Declaration</h3>
+                <p>Utkal Medpro provides only home-based paramedical services including home blood sample collection, home injections (only as prescribed by a registered medical practitioner), and post-surgical care (as per doctor's written instructions).</p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Important Notice</h3>
+                <p>We do not provide emergency medical services, diagnosis, or medical treatment. All services are rendered strictly as per the written advice or prescription of a qualified and registered medical doctor.</p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Legal Notice</h3>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Our team consists of trained paramedical professionals</li>
+                  <li>We do not substitute the services of a hospital, nursing home, or licensed medical practitioner</li>
+                  <li>Clients are advised to consult their doctor for any medical condition or emergency</li>
+                  <li>By availing our services, you acknowledge that Utkal Medpro is not liable for any medical complications arising from services rendered under doctor's supervision</li>
+                  <li>All medical instructions, prescriptions, and post-operative protocols must be provided clearly by your consulting doctor</li>
+                  <li>For any medical emergency, please contact a hospital or emergency medical services immediately</li>
+                </ul>
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200">
+              <button
+                onClick={() => setShowTerms(false)}
+                className="w-full btn-primary text-white py-3 px-6 rounded-lg font-semibold"
+              >
+                I Understand
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Emergency Contact */}
       <section className="py-16 bg-white">

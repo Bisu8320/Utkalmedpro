@@ -6,9 +6,13 @@ const OFFERS_KEY = 'utkal_medpro_offers'
 const MESSAGES_KEY = 'utkal_medpro_messages'
 
 // Initialize with sample data if empty
-const initializeSampleData = () => {
-  const bookings = getBookings()
-  if (bookings.length === 0) {
+export const initializeSampleData = () => {
+  // Check if data already exists to avoid overwriting
+  const existingBookings = localStorage.getItem(BOOKINGS_KEY)
+  const existingMessages = localStorage.getItem(MESSAGES_KEY)
+  const existingOffers = localStorage.getItem(OFFERS_KEY)
+
+  if (!existingBookings) {
     // Add sample bookings for demonstration
     const sampleBookings: Booking[] = [
       {
@@ -57,8 +61,7 @@ const initializeSampleData = () => {
     localStorage.setItem(BOOKINGS_KEY, JSON.stringify(sampleBookings))
   }
 
-  const messages = getContactMessages()
-  if (messages.length === 0) {
+  if (!existingMessages) {
     // Add sample contact messages
     const sampleMessages: ContactMessage[] = [
       {
@@ -85,8 +88,7 @@ const initializeSampleData = () => {
     localStorage.setItem(MESSAGES_KEY, JSON.stringify(sampleMessages))
   }
 
-  const offers = getOffers()
-  if (offers.length === 0) {
+  if (!existingOffers) {
     // Add sample offers
     const sampleOffers: Offer[] = [
       {
@@ -128,15 +130,7 @@ export const saveBooking = (booking: Omit<Booking, 'id' |'status'| 'createdAt'>)
 
 export const getBookings = (): Booking[] => {
   const stored = localStorage.getItem(BOOKINGS_KEY)
-  const bookings = stored ? JSON.parse(stored) : []
-  
-  // Initialize sample data if no bookings exist
-  if (bookings.length === 0) {
-    initializeSampleData()
-    return JSON.parse(localStorage.getItem(BOOKINGS_KEY) || '[]')
-  }
-  
-  return bookings
+  return stored ? JSON.parse(stored) : []
 }
 
 export const updateBookingStatus = (id: string, status: Booking['status']): void => {
@@ -163,15 +157,7 @@ export const saveOffer = (offer: Omit<Offer, 'id' | 'createdAt'>): Offer => {
 
 export const getOffers = (): Offer[] => {
   const stored = localStorage.getItem(OFFERS_KEY)
-  const offers = stored ? JSON.parse(stored) : []
-  
-  // Initialize sample data if no offers exist
-  if (offers.length === 0) {
-    initializeSampleData()
-    return JSON.parse(localStorage.getItem(OFFERS_KEY) || '[]')
-  }
-  
-  return offers
+  return stored ? JSON.parse(stored) : []
 }
 
 export const updateOffer = (id: string, updates: Partial<Offer>): void => {
@@ -205,15 +191,7 @@ export const saveContactMessage = (message: Omit<ContactMessage, 'id' | 'created
 
 export const getContactMessages = (): ContactMessage[] => {
   const stored = localStorage.getItem(MESSAGES_KEY)
-  const messages = stored ? JSON.parse(stored) : []
-  
-  // Initialize sample data if no messages exist
-  if (messages.length === 0) {
-    initializeSampleData()
-    return JSON.parse(localStorage.getItem(MESSAGES_KEY) || '[]')
-  }
-  
-  return messages
+  return stored ? JSON.parse(stored) : []
 }
 
 export const updateMessageStatus = (id: string, status: ContactMessage['status']): void => {

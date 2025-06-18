@@ -15,7 +15,8 @@ import {
   Phone,
   Mail,
   Clock,
-  RefreshCw
+  RefreshCw,
+  MessageCircle
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { 
@@ -33,6 +34,7 @@ import {
   OFFERS_KEY,
   MESSAGES_KEY
 } from '../utils/storage'
+import { sendBookingConfirmationSMS, sendBookingCancellationSMS, getSMSLogs } from '../utils/smsService'
 import { Booking, Offer, ContactMessage } from '../types'
 
 const AdminDashboard = () => {
@@ -41,9 +43,11 @@ const AdminDashboard = () => {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [offers, setOffers] = useState<Offer[]>([])
   const [messages, setMessages] = useState<ContactMessage[]>([])
+  const [smsLogs, setSmsLogs] = useState<any[]>([])
   const [showOfferForm, setShowOfferForm] = useState(false)
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
+  const [sendingSMS, setSendingSMS] = useState<string | null>(null)
 
   const [offerForm, setOfferForm] = useState({
     title: '',
@@ -95,6 +99,7 @@ const AdminDashboard = () => {
     setBookings(getBookings())
     setOffers(getOffers())
     setMessages(getContactMessages())
+    setSmsLogs(getSMSLogs())
     setLastUpdate(new Date())
   }
 
@@ -102,14 +107,52 @@ const AdminDashboard = () => {
     return <Navigate to="/admin/login" replace />
   }
 
-  const handleBookingStatusUpdate = (id: string, status: Booking['status']) => {
+  const handleBookingStatusUpdate = async (id: string, status: Booking['status']) => {
+    const booking = bookings.find(b => b.id === id)
+    if (!booking) return
+
+    // Update booking status
     updateBookingStatus(id, status)
-    // Data will be updated automatically via listeners
+    
+    // Send SMS notification for confirmed or cancelled bookings
+    if (status === 'confirmed' || status === 'cancelled') {
+      setSendingSMS(id)
+      
+      try {
+        let smsSuccess = false
+        
+        if (status === 'confirmed') {
+          smsSuccess = await sendBookingConfirmationSMS(
+            booking.phone,
+            booking.name,
+            booking.service,
+            booking.date,
+            booking.time,
+            booking.id
+          )
+        } else if (status === 'cancelled') {
+          smsSuccess = await sendBookingCancellationSMS(
+            booking.phone,
+            booking.name,
+            booking.service,
+            booking.id
+          )
+        }
+        
+        if (smsSuccess) {
+          // Refresh SMS logs
+          setSmsLogs(getSMSLogs())
+        }
+      } catch (error) {
+        console.error('Error sending SMS:', error)
+      } finally {
+        setSendingSMS(null)
+      }
+    }
   }
 
   const handleMessageStatusUpdate = (id: string, status: ContactMessage['status']) => {
     updateMessageStatus(id, status)
-    // Data will be updated automatically via listeners
   }
 
   const handleOfferSubmit = (e: React.FormEvent) => {
@@ -122,7 +165,6 @@ const AdminDashboard = () => {
     }
     setOfferForm({ title: '', description: '', discount: '', validUntil: '', isActive: true })
     setShowOfferForm(false)
-    // Data will be updated automatically via listeners
   }
 
   const handleEditOffer = (offer: Offer) => {
@@ -140,7 +182,6 @@ const AdminDashboard = () => {
   const handleDeleteOffer = (id: string) => {
     if (confirm('Are you sure you want to delete this offer?')) {
       deleteOffer(id)
-      // Data will be updated automatically via listeners
     }
   }
 
@@ -160,7 +201,8 @@ const AdminDashboard = () => {
   const tabs = [
     { id: 'bookings', label: 'Bookings', icon: Calendar, count: bookings.length },
     { id: 'messages', label: 'Messages', icon: MessageSquare, count: messages.filter(m => m.status === 'new').length },
-    { id: 'offers', label: 'Offers', icon: Tag, count: offers.length }
+    { id: 'offers', label: 'Offers', icon: Tag, count: offers.length },
+    { id: 'sms', label: 'SMS Logs', icon: MessageCircle, count: smsLogs.length }
   ]
 
   return (
@@ -232,11 +274,11 @@ const AdminDashboard = () => {
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center">
-              <Tag className="h-8 w-8 text-orange-500" />
+              <MessageCircle className="h-8 w-8 text-orange-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Active Offers</p>
+                <p className="text-sm font-medium text-gray-600">SMS Sent</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {offers.filter(o => o.isActive).length}
+                  {smsLogs.filter(log => log.status === 'sent').length}
                 </p>
               </div>
             </div>
@@ -357,14 +399,18 @@ const AdminDashboard = () => {
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
                                 {booking.status}
                               </span>
+                              {sendingSMS === booking.id && (
+                                <div className="text-xs text-blue-600 mt-1">Sending SMS...</div>
+                              )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <div className="flex space-x-2">
                                 {booking.status === 'pending' && (
                                   <button
                                     onClick={() => handleBookingStatusUpdate(booking.id, 'confirmed')}
-                                    className="text-green-600 hover:text-green-900"
-                                    title="Confirm"
+                                    disabled={sendingSMS === booking.id}
+                                    className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                                    title="Confirm & Send SMS"
                                   >
                                     <Check className="h-4 w-4" />
                                   </button>
@@ -380,8 +426,9 @@ const AdminDashboard = () => {
                                 )}
                                 <button
                                   onClick={() => handleBookingStatusUpdate(booking.id, 'cancelled')}
-                                  className="text-red-600 hover:text-red-900"
-                                  title="Cancel"
+                                  disabled={sendingSMS === booking.id}
+                                  className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                                  title="Cancel & Send SMS"
                                 >
                                   <X className="h-4 w-4" />
                                 </button>
@@ -595,6 +642,54 @@ const AdminDashboard = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* SMS Logs Tab */}
+            {activeTab === 'sms' && (
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">SMS Activity Logs</h2>
+                <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                  <p className="text-sm text-blue-800">
+                    📱 SMS notifications are automatically sent when bookings are confirmed or cancelled.
+                    In production, integrate with SMS providers like Textlocal, Twilio, or MSG91.
+                  </p>
+                </div>
+                
+                {smsLogs.length === 0 ? (
+                  <div className="text-center py-12">
+                    <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No SMS logs yet</h3>
+                    <p className="text-gray-600">SMS activity will appear here when bookings are confirmed or cancelled.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {smsLogs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map((log) => (
+                      <div key={log.id} className={`p-4 rounded-lg border ${
+                        log.status === 'sent' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                      }`}>
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium text-gray-900">SMS to {log.phoneNumber}</p>
+                            <p className="text-sm text-gray-600">
+                              {new Date(log.timestamp).toLocaleString()}
+                            </p>
+                          </div>
+                          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                            log.status === 'sent' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {log.status}
+                          </span>
+                        </div>
+                        {log.message && (
+                          <div className="bg-white p-3 rounded border text-sm text-gray-700">
+                            {log.message}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

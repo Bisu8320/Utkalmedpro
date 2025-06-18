@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import { Calendar, Clock, MapPin, User, Phone, Mail, FileText, AlertTriangle } from 'lucide-react'
 import { saveBooking } from '../utils/storage'
+import { useCustomerAuth } from '../contexts/CustomerAuthContext'
 
 const Booking = () => {
+  const { customer } = useCustomerAuth()
+  
   const [formData, setFormData] = useState({
     service: '',
-    name: '',
-    phone: '',
-    email: '',
+    name: customer?.name || '',
+    phone: customer?.phone || '',
+    email: customer?.email || '',
     address: '',
     date: '',
     time: '',
@@ -57,14 +60,14 @@ const Booking = () => {
     
     try {
       saveBooking(bookingData)
-      alert('Booking request submitted successfully! We will contact you shortly to confirm.')
+      alert('Booking request submitted successfully! We will contact you shortly to confirm. You can track your booking status by logging into your account.')
       
       // Reset form
       setFormData({
         service: '',
-        name: '',
-        phone: '',
-        email: '',
+        name: customer?.name || '',
+        phone: customer?.phone || '',
+        email: customer?.email || '',
         address: '',
         date: '',
         time: '',
@@ -91,6 +94,14 @@ const Booking = () => {
             Schedule professional paramedical services at your convenience. 
             Our certified professionals will visit you at your preferred location.
           </p>
+          {customer && (
+            <div className="mt-6 bg-blue-600 bg-opacity-50 p-4 rounded-lg inline-block">
+              <p className="text-blue-100">
+                Welcome back, <span className="font-semibold">{customer.name}</span>! 
+                Your details have been pre-filled for faster booking.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -315,7 +326,12 @@ const Booking = () => {
                     Book Appointment
                   </button>
                   <p className="text-sm text-gray-600 text-center mt-4">
-                    We will contact you within 30 minutes to confirm your appointment
+                    We will contact you within 30 minutes to confirm your appointment.
+                    {customer && (
+                      <span className="block mt-1 text-primary-600 font-medium">
+                        Track your booking status in your dashboard.
+                      </span>
+                    )}
                   </p>
                 </div>
               </form>

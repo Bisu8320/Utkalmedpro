@@ -11,6 +11,9 @@ export interface Booking {
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
   createdAt: string
   price: string
+  assignedStaffId?: string
+  assignedStaffName?: string
+  staffNotes?: string
 }
 
 export interface Offer {
@@ -32,4 +35,33 @@ export interface ContactMessage {
   message: string
   status: 'new' | 'read' | 'replied'
   createdAt: string
+}
+
+export interface Staff {
+  id: string
+  name: string
+  phone: string
+  email: string
+  specialization: string[]
+  experience: string
+  qualification: string
+  isActive: boolean
+  currentBookings: number
+  totalCompleted: number
+  rating: number
+  joinedDate: string
+  address: string
+  emergencyContact: string
+  profileImage?: string
+}
+
+export interface StaffMessage {
+  id: string
+  staffId: string
+  bookingId: string
+  message: string
+  type: 'assignment' | 'update' | 'completion' | 'cancellation'
+  sentAt: string
+  readAt?: string
+  adminId: string
 }

@@ -82,6 +82,40 @@ export const sendBookingCancellationSMS = async (
   }
 }
 
+export const sendStaffAssignmentSMS = async (
+  staffPhone: string,
+  staffName: string,
+  customerName: string,
+  service: string,
+  date: string,
+  time: string,
+  address: string,
+  bookingId: string
+): Promise<boolean> => {
+  try {
+    const message = `Hi ${staffName}, you have been assigned a new booking:\n\nCustomer: ${customerName}\nService: ${service}\nDate: ${date} at ${time}\nAddress: ${address}\nBooking ID: #${bookingId}\n\nPlease contact customer before visit. - Utkal Medpro`
+    
+    console.log('Staff Assignment SMS Sent:', {
+      to: staffPhone,
+      message: message,
+      timestamp: new Date().toISOString()
+    })
+    
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    if (process.env.NODE_ENV === 'development') {
+      alert(`📱 Staff Assignment SMS Sent to ${staffPhone}:\n\n${message}`)
+    }
+    
+    logSMSActivity(staffPhone, message, 'sent')
+    return true
+  } catch (error) {
+    console.error('Error sending staff assignment SMS:', error)
+    logSMSActivity(staffPhone, '', 'failed')
+    return false
+  }
+}
+
 // Log SMS activity for admin tracking
 const logSMSActivity = (phoneNumber: string, message: string, status: 'sent' | 'failed') => {
   try {

@@ -3,6 +3,19 @@ import { Navigate } from 'react-router-dom'
 import { Lock, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
+/**
+ * Renders the admin login page and handles login authentication.
+ * @example
+ * adminLoginPage()
+ * <Navigate to="/admin/dashboard" replace />
+ * @param {React.FormEvent} e - The form event triggered on submit.
+ * @returns {JSX.Element} A JSX element representing the admin login page.
+ * @description
+ *   - Redirects to admin dashboard if authentication is successful.
+ *   - Provides UI feedback for invalid password attempts.
+ *   - Toggles password visibility between text and password types.
+ *   - Ensures password input is reset upon failed login attempts.
+ */
 const AdminLogin = () => {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)

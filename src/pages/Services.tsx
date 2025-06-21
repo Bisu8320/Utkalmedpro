@@ -2,6 +2,18 @@
 import { Link } from 'react-router-dom'
 import { TestTube, Syringe, Ban as Bandage, Heart, Clock, CheckCircle, Shield, Users } from 'lucide-react'
 
+/**
+ * Renders a page with information and booking options for paramedical services.
+ * @example
+ * const servicesPage = renderServicesPage()
+ * <div>...page content...</div>
+ * @param none This function does not accept any parameters.
+ * @returns {JSX.Element} A React component displaying service information, booking options, and other related sections.
+ * @description
+ *   - Maps over predefined `services` and `additionalServices` arrays to create UI elements displaying service details.
+ *   - Includes sections such as Hero Section, Main Services, Additional Services, Service Process, and CTA Section.
+ *   - Provides a user interface for booking services or contacting for more information, utilizing icons and a responsive design.
+ */
 const Services = () => {
   const services = [
     {

@@ -3,6 +3,19 @@ import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, Heart, Phone, User } from 'lucide-react'
 import { useCustomerAuth } from '../contexts/CustomerAuthContext'
 
+/**
+ * Renders the header component for the Utkal Medpro application.
+ * @example
+ * (isAuthenticated, customer)
+ * <Header />
+ * @param {boolean} isAuthenticated - A flag indicating if the user is authenticated.
+ * @param {Object} customer - An object containing customer details.
+ * @returns {JSX.Element} The Header component.
+ * @description
+ *   - Uses React hooks like useState and useLocation to manage state and routing.
+ *   - Provides navigation links for both desktop and mobile views.
+ *   - Displays user-specific links and options based on authentication status.
+ */
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const location = useLocation()

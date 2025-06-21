@@ -19,6 +19,20 @@ interface CustomerAuthContextType {
 
 const CustomerAuthContext = createContext<CustomerAuthContextType | undefined>(undefined)
 
+/**
+ * Provides customer authentication capabilities via context
+ * @example
+ * <CustomerAuthContext.Provider>
+ *  {children}
+ * </CustomerAuthContext.Provider>
+ * @param {Object} {children} - React child components to be wrapped by the context provider.
+ * @returns {JSX.Element} A context provider wrapping its children to supply authentication functionalities.
+ * @description
+ *   - Utilizes local storage for persistent user session management.
+ *   - Implements OTP sending using session storage and manual validation.
+ *   - Creates new customer data and persists it, if not existing during login.
+ *   - Provides callback functions for login, registration, logout, and OTP sending.
+ */
 export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -37,6 +51,19 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [])
 
+  /**
+   * Simulates sending an OTP via SMS for phone number authentication.
+   * @example
+   * sync("1234567890")
+   * true
+   * @param {string} phone - The phone number to which the OTP will be sent.
+   * @returns {Promise<boolean>} Resolves to true if OTP is successfully "sent", otherwise false.
+   * @description
+   *   - Simulates OTP generation and storage using `sessionStorage`.
+   *   - OTP is valid for 5 minutes from the time it's generated.
+   *   - Prints the OTP to the console and shows it in an alert for demo purposes.
+   *   - In a real app, the OTP would be sent via an actual SMS service.
+   */
   const sendOTP = async (phone: string): Promise<boolean> => {
     try {
       // In a real app, this would call your SMS API
@@ -58,6 +85,20 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }
 
+  /**
+  * Authenticates a user via their phone number and OTP.
+  * @example
+  * sync("1234567890", "123456")
+  * true
+  * @param {string} phone - The phone number of the user attempting to authenticate.
+  * @param {string} otp - The one-time password sent to the user's phone.
+  * @returns {Promise<boolean>} Resolves to true if authentication is successful, otherwise false.
+  * @description
+  *   - The function verifies the OTP stored in sessionStorage against the provided OTP.
+  *   - If the phone number doesn't exist in the customer list, a new customer is created.
+  *   - Session data related to OTP is cleared upon successful authentication.
+  *   - Error handling is performed to ensure the function returns false in case of exceptions.
+  */
   const login = async (phone: string, otp: string): Promise<boolean> => {
     try {
       // Verify OTP
@@ -104,6 +145,19 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }
 
+  /**
+   * Synchronizes customer data with local storage and updates authentication state.
+   * @example
+   * sync({name: 'John Doe', phone: '1234567890'})
+   * // returns true if the customer was successfully added, false if the customer already exists or an error occurs.
+   * @param {Omit<Customer, 'id' | 'createdAt'>} customerData - The customer data excluding 'id' and 'createdAt' that needs to be synchronized.
+   * @returns {Promise<boolean>} Returns a promise that resolves to true if the customer data is successfully synchronized, false otherwise.
+   * @description
+   *   - The function checks for existing customers based on the phone number before adding new data.
+   *   - Newly created customers are assigned a unique 'id' using the current timestamp and 'createdAt' using the current date and time.
+   *   - Updates the authentication state to reflect the addition of a new customer.
+   *   - Stores customer authentication information in local storage.
+   */
   const register = async (customerData: Omit<Customer, 'id' | 'createdAt'>): Promise<boolean> => {
     try {
       const customers = getCustomers()

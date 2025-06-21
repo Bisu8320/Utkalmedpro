@@ -12,6 +12,23 @@ const SMS_CONFIG: SMSConfig = {
   baseUrl: process.env.VITE_SMS_API_URL || 'https://api.textlocal.in/send/'
 }
 
+/**
+ * Sends a booking confirmation SMS to the customer.
+ * @example
+ * sync("+123456789", "John Doe", "Consultation", "2023-10-01", "15:00", "ABC123")
+ * true
+ * @param {string} phoneNumber - The customer's phone number.
+ * @param {string} customerName - The customer's name.
+ * @param {string} service - The booked service description.
+ * @param {string} date - The date of the service.
+ * @param {string} time - The time of the service.
+ * @param {string} bookingId - The unique booking identifier.
+ * @returns {Promise<boolean>} Returns true if the SMS was successfully sent, otherwise false.
+ * @description
+ *   - Simulates sending an SMS by logging to console and optionally showing an alert in development.
+ *   - Logs SMS activity for administrative tracking.
+ *   - Handles errors during SMS sending process, logging failed attempt.
+ */
 export const sendBookingConfirmationSMS = async (
   phoneNumber: string, 
   customerName: string, 
@@ -52,6 +69,21 @@ export const sendBookingConfirmationSMS = async (
   }
 }
 
+/**
+ * Sends a cancellation SMS to the specified phone number.
+ * @example
+ * sync('+911234567890', 'John Doe', 'Dental Appointment', '123456')
+ * true
+ * @param {string} phoneNumber - The recipient's phone number.
+ * @param {string} customerName - The name of the customer.
+ * @param {string} service - The service that has been booked.
+ * @param {string} bookingId - The unique ID of the booking.
+ * @returns {Promise<boolean>} Indicates whether the SMS was sent successfully.
+ * @description
+ *   - Logs SMS activity with a status of 'sent' or 'failed' based on operation success.
+ *   - Displays an alert with the SMS details in development environment.
+ *   - Simulates SMS sending with a delay of 1 second.
+ */
 export const sendBookingCancellationSMS = async (
   phoneNumber: string, 
   customerName: string, 
@@ -82,6 +114,25 @@ export const sendBookingCancellationSMS = async (
   }
 }
 
+/**
+* Sends a staff assignment SMS with booking details to the specified staff member.
+* @example
+* sync('+123456789', 'John Doe', 'Jane Smith', 'Consultation', '2023-10-25', '10:00 AM', '123 Medical St.', 'B123')
+* true
+* @param {string} staffPhone - The phone number of the staff member receiving the assignment.
+* @param {string} staffName - The name of the staff member.
+* @param {string} customerName - The name of the customer the staff is assigned to.
+* @param {string} service - The type of service the customer booked.
+* @param {string} date - The date of the booking.
+* @param {string} time - The time of the booking.
+* @param {string} address - The address where the service is to be provided.
+* @param {string} bookingId - The unique identifier for the booking.
+* @returns {Promise<boolean>} Returns a promise that resolves to true if the SMS is sent successfully, or false in case of an error.
+* @description
+*   - Logs the SMS activity as 'sent' or 'failed' based on the success of the operation.
+*   - In development mode, displays an alert with the message details.
+*   - Simulates a delay to mimic SMS sending process.
+*/
 export const sendStaffAssignmentSMS = async (
   staffPhone: string,
   staffName: string,
@@ -117,6 +168,19 @@ export const sendStaffAssignmentSMS = async (
 }
 
 // Log SMS activity for admin tracking
+/**
+ * Logs SMS activities by storing the details of the message, recipient, and delivery status.
+ * @example
+ * logSMSActivity('+1234567890', 'Hello, World!', 'sent')
+ * @param {string} phoneNumber - The recipient's phone number.
+ * @param {string} message - The content of the SMS message.
+ * @param {'sent' | 'failed'} status - The delivery status of the message.
+ * @returns {void} This function does not return anything.
+ * @description
+ *   - Maintains a history of the last 100 SMS logs.
+ *   - Uses localStorage to persist SMS log data.
+ *   - Handles any errors during logging by outputting them to the console.
+ */
 const logSMSActivity = (phoneNumber: string, message: string, status: 'sent' | 'failed') => {
   try {
     const logs = getSMSLogs()
@@ -153,6 +217,20 @@ export const getSMSLogs = () => {
 // For production integration with popular SMS providers:
 
 // 1. Textlocal API integration
+/**
+ * Sends an SMS message to a specified phone number using a predefined SMS service configuration.
+ * @example
+ * sync('+1234567890', 'Hello World!')
+ * { status: 'success', messageId: 'abc123' }
+ * @param {string} phoneNumber - The recipient's phone number in international format.
+ * @param {string} message - The text message content to send to the recipient.
+ * @returns {Promise<Object>} A promise that resolves to the JSON response from the SMS service.
+ * @description
+ *   - Utilizes FormData to format message data for the SMS service API.
+ *   - Requires an API key and sender ID, which are configured in SMS_CONFIG.
+ *   - Communicates with the SMS service via a POST request to the service's base URL.
+ *   - The response JSON typically contains the status and a message ID for tracking.
+ */
 export const sendSMSViaTextlocal = async (phoneNumber: string, message: string) => {
   const formData = new FormData()
   formData.append('apikey', SMS_CONFIG.apiKey)
@@ -169,6 +247,19 @@ export const sendSMSViaTextlocal = async (phoneNumber: string, message: string) 
 }
 
 // 2. Twilio API integration example
+/**
+ * Sends an SMS to a specified phone number using Twilio's API.
+ * @example
+ * sync('+1234567890', 'Hello, World!')
+ * { sid: 'SMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', status: 'queued', ... }
+ * @param {string} phoneNumber - The recipient's phone number in E.164 format.
+ * @param {string} message - The message content to be sent.
+ * @returns {Promise<Object>} A promise that resolves to the response object containing details of the sent message.
+ * @description
+ *   - Utilizes Twilio's REST API to send SMS messages.
+ *   - Requires environment variables for account SID, auth token, and originating phone number.
+ *   - Uses basic authentication for API access.
+ */
 export const sendSMSViaTwilio = async (phoneNumber: string, message: string) => {
   const accountSid = process.env.VITE_TWILIO_ACCOUNT_SID
   const authToken = process.env.VITE_TWILIO_AUTH_TOKEN
@@ -191,6 +282,20 @@ export const sendSMSViaTwilio = async (phoneNumber: string, message: string) => 
 }
 
 // 3. MSG91 API integration example
+/**
+* Sends an SMS to a specified phone number using MSG91 service.
+* @example
+* sync('9876543210', 'Hello, this is a test message.')
+* { message: 'SMS sent successfully', status: 'success' }
+* @param {string} phoneNumber - The recipient's phone number in string format.
+* @param {string} message - The SMS content to be sent to the recipient.
+* @returns {object} JSON response from MSG91 API indicating the status of the SMS.
+* @description
+*   - Uses environment variables for authentication and sender ID.
+*   - Utilizes MSG91 API's HTTP route for SMS delivery.
+*   - Assumes the country code as '91'.
+*   - Requires the configuration of MSG91 credentials via environment variables.
+*/
 export const sendSMSViaMSG91 = async (phoneNumber: string, message: string) => {
   const authKey = process.env.VITE_MSG91_AUTH_KEY
   const senderId = process.env.VITE_MSG91_SENDER_ID

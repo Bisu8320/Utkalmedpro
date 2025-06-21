@@ -11,6 +11,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 // Simple password - in production, use proper authentication
 const ADMIN_PASSWORD = 'utkalmedpro2024'
 
+/**
+ * Provides authentication context for managing user's login state.
+ * @example
+ * const { isAuthenticated, login, logout } = useContext(AuthContext);
+ * login('password'); // returns true if password is correct
+ * @param {object} { children } - React children components to be wrapped with the AuthContext provider.
+ * @returns {JSX.Element} A React context provider that supplies authentication status and methods.
+ * @description
+ *   - Initializes the authentication state based on local storage.
+ *   - Handles login by verifying password and updating state and local storage.
+ *   - Manages logout by clearing the authentication state and local storage.
+ */
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 

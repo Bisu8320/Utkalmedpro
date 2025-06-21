@@ -3,6 +3,19 @@ import { Navigate, Link } from 'react-router-dom'
 import { Phone, Shield, ArrowRight, Clock } from 'lucide-react'
 import { useCustomerAuth } from '../contexts/CustomerAuthContext'
 
+/**
+ * Manages customer login functionality via phone number and OTP verification.
+ * @example
+ * CustomerLogin()
+ * JSX component rendering login interface
+ * @param {React.FormEvent} {e} - Event triggered by a user action, such as form submission.
+ * @returns {JSX.Element} Conditionally renders the login form or redirects upon successful authentication.
+ * @description
+ *   - Handles state transitions between phone and OTP verification steps.
+ *   - Validates phone number format and OTP length before proceeding.
+ *   - Manages asynchronous calls to send and verify OTP via the sendOTP and login functions.
+ *   - Displays error messages for invalid inputs or failed operations.
+ */
 const CustomerLogin = () => {
   const [step, setStep] = useState<'phone' | 'otp'>('phone')
   const [phone, setPhone] = useState('')
@@ -16,6 +29,20 @@ const CustomerLogin = () => {
     return <Navigate to="/customer/dashboard" replace />
   }
 
+  /**
+   * Handles phone number validation and OTP sending during customer login.
+   * @example
+   * sync(event)
+   * // prevents default form submission
+   * // validates phone number and sends OTP
+   * @param {React.FormEvent} e - The form event triggered by user interaction.
+   * @returns {void} This function does not return a value; instead, it updates application state.
+   * @description
+   *   - Prevents default form submission to handle custom logic.
+   *   - Validates the phone number format using a regular expression.
+   *   - Sets loading state and handles errors related to sending OTP asynchronously.
+   *   - Updates the current step to 'otp' upon successful OTP send.
+   */
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -44,6 +71,19 @@ const CustomerLogin = () => {
     }
   }
 
+  /**
+  * Handles the login process upon form submission using an OTP.
+  * @example
+  * sync(event)
+  * No return value
+  * @param {React.FormEvent} e - Event triggered on form submission.
+  * @returns {void} No return value.
+  * @description
+  *   - Prevents the default form submission behavior.
+  *   - Checks if the OTP length is exactly 6 digits before proceeding.
+  *   - Manages loading state and error messages based on OTP validation.
+  *   - Ensures loading state is reset in case of success, failure, or error.
+  */
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -67,6 +107,17 @@ const CustomerLogin = () => {
     }
   }
 
+  /**
+  * Sends an OTP to the specified phone number and handles the request state.
+  * @example
+  * sync()
+  * // Displays a success alert or sets an error message based on the result of sending the OTP.
+  * @param {string} {phone} - The phone number to which the OTP is sent.
+  * @returns {void} No return value.
+  * @description
+  *   - Sets an empty error message and loading state true before attempting to send the OTP.
+  *   - Updates the loading state to false once the OTP send attempt is completed.
+  */
   const handleResendOTP = async () => {
     setError('')
     setLoading(true)

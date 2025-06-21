@@ -1,5 +1,17 @@
 import { Heart, Phone, Mail, MapPin, Clock } from 'lucide-react'
 
+/**
+ * Renders a styled footer section for a healthcare service website.
+ * @example
+ * ()
+ * Returns JSX element with company info, quick links, and contact info sections.
+ * @returns {JSX.Element} A footer component containing company information, quick links, and contact details.
+ * @description
+ *   - Displays the footer with background color, text color, and various sections for informational content.
+ *   - Company Info section includes branding details and a summary of services offered.
+ *   - Quick Links section provides easy navigation to main pages of the website.
+ *   - Contact Info section presents contact details including phone number, email, and physical address.
+ */
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white">

@@ -18,6 +18,18 @@ import { useCustomerAuth } from '../contexts/CustomerAuthContext'
 import { getBookings, addStorageListener, removeStorageListener, BOOKINGS_KEY } from '../utils/storage'
 import { Booking } from '../types'
 
+/**
+ * Renders a dashboard for customer bookings, displaying booking statuses and providing logout functionality.
+ * @example
+ * functionName()
+ * <div>My Dashboard</div>
+ * @param None
+ * @returns {JSX.Element} The rendered customer dashboard component.
+ * @description
+ *   - Listens for authentication and customer details to load and display user-specific bookings.
+ *   - Handles real-time updates to booking data by listening for storage changes.
+ *   - Allows customers to view booking details, status messages, and take action such as booking a new service or logging out.
+ */
 const CustomerDashboard = () => {
   const { customer, isAuthenticated, logout } = useCustomerAuth()
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -40,6 +52,18 @@ const CustomerDashboard = () => {
     }
   }, [isAuthenticated, customer])
 
+  /**
+  * Filters and sorts bookings for a specific customer based on their phone or email.
+  * @example
+  * filterCustomerBookings(customer)
+  * Returns a sorted array of bookings for the specified customer.
+  * @param {Object} customer - The customer object containing phone and email attributes.
+  * @returns {Array} Returns a sorted array of customer bookings, or no return if customer is not defined.
+  * @description
+  *   - Retrieves all bookings using the getBookings function.
+  *   - Filters bookings to include only those that match the customer's phone or email.
+  *   - Sorts the filtered bookings by creation date in descending order.
+  */
   const loadCustomerBookings = () => {
     if (!customer) return
     
@@ -60,6 +84,17 @@ const CustomerDashboard = () => {
     return <Navigate to="/customer/login" replace />
   }
 
+  /**
+   * Returns a specific icon component based on the status string provided.
+   * @example
+   * getStatusIcon('confirmed')
+   * Returns a blue CheckCircle icon component.
+   * @param {string} status - The current status of an item, such as 'pending', 'confirmed', 'completed', or 'cancelled'.
+   * @returns {React.Element} A JSX element representing an icon associated with the status.
+   * @description
+   *   - Utilizes Tailwind CSS classes for icon styling.
+   *   - Default icon is an AlertCircle with a gray color if the status does not match known cases.
+   */
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -85,6 +120,19 @@ const CustomerDashboard = () => {
     }
   }
 
+  /**
+  * Returns a message based on the booking status.
+  * @example
+  * getBookingMessage('confirmed')
+  * 'Your booking is confirmed! Our professional will visit you at the scheduled time.'
+  * @param {string} status - The current status of the booking.
+  * @returns {string} A message corresponding to the provided booking status.
+  * @description
+  *   - Handles five specific booking statuses: 'pending', 'confirmed', 'completed', 'cancelled', and 'default'.
+  *   - Provides a contact suggestion for unknown status cases.
+  *   - Suitable for customer-facing applications to convey booking information clearly.
+  *   - Helpful in improving communication with users regarding the progress and outcome of their bookings.
+  */
   const getStatusMessage = (status: string) => {
     switch (status) {
       case 'pending':

@@ -3,6 +3,19 @@ import { X, Tag } from 'lucide-react'
 import { getOffers } from '../utils/storage'
 import { Offer } from '../types'
 
+/**
+ * Displays an offer banner that cycles through active offers every 5 seconds.
+ * @example
+ * OfferBanner()
+ * React JSX element displaying the offer banner.
+ * @param {Offer[]} {offers} - List of offers filtered to ensure they are active and within their validity period.
+ * @returns {JSX.Element|null} Null if no offers are available or the banner is not visible, otherwise returns the offer banner element.
+ * @description
+ *   - The banner cycles through offers automatically using a timer when there is more than one offer.
+ *   - A button is available to manually cycle through offers.
+ *   - Includes a close button to hide the offer banner.
+ *   - Offers are refreshed based on predefined conditions whenever the component mounts.
+ */
 const OfferBanner = () => {
   const [offers, setOffers] = useState<Offer[]>([])
   const [currentOfferIndex, setCurrentOfferIndex] = useState(0)

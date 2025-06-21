@@ -13,6 +13,18 @@ import AdminDashboard from './pages/AdminDashboard'
 import CustomerLogin from './pages/CustomerLogin'
 import CustomerDashboard from './pages/CustomerDashboard'
 
+/**
+ * Initializes and returns the main application component layout.
+ * @example
+ * App()
+ * React Component Element
+ * @returns {JSX.Element} Returns the complete application component with layout, routes, and providers.
+ * @description
+ *   - Integrates authentication providers for both admin and customer contexts.
+ *   - Encompasses all routing logic with defined paths to main application pages.
+ *   - Includes essential UI components like header, footer, and offer banner.
+ *   - Utilizes React Router for managing navigation within the application.
+ */
 function App() {
   return (
     <AuthProvider>

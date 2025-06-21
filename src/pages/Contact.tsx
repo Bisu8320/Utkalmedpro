@@ -2,6 +2,19 @@ import React, { useState } from 'react'
 import { Phone, Mail, MapPin, Clock, Send, MessageCircle } from 'lucide-react'
 import { saveContactMessage } from '../utils/storage'
 
+/**
+ * Renders a contact page with a form for submitting messages and displaying contact information.
+ * @example
+ * ContactPage()
+ * Returns a JSX element representing the contact page.
+ * @param {void} None - This function does not accept any parameters.
+ * @returns {JSX.Element} The rendered contact page component.
+ * @description
+ *   - Uses React state to track form input changes and handle form submission.
+ *   - Includes sections for contact information, contact form, map, and emergency services.
+ *   - Alerts the user upon successful form submission and resets form fields.
+ *   - Provides multiple ways to contact the service, including phone, email, and WhatsApp.
+ */
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -19,6 +32,18 @@ const Contact = () => {
     }))
   }
 
+  /**
+  * Prevents default form submission behavior and processes contact form data.
+  * @example
+  * handleFormSubmit(event)
+  * Displays a thank you alert and resets the form fields.
+  * @param {React.FormEvent} e - Event object representing the form submission event.
+  * @returns {void} No return value.
+  * @description
+  *   - Saves the contact message using `saveContactMessage`.
+  *   - Resets form fields to their initial empty state.
+  *   - Alerts the user with a confirmation message upon submission.
+  */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     saveContactMessage(formData)

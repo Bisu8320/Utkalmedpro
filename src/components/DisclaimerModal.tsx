@@ -6,6 +6,20 @@ interface DisclaimerModalProps {
   onClose: () => void
 }
 
+/**
+ * DisclaimerModal displays a modal with service declaration, disclaimer, and important notices.
+ * @example
+ * DisclaimerModal({ isOpen: true, onClose: () => console.log('Modal closed') })
+ * null (if isOpen is false)
+ * @param {Object} props - The component props.
+ * @param {boolean} props.isOpen - Indicates whether the modal should be displayed.
+ * @param {function} props.onClose - Function to call when closing the modal.
+ * @returns {JSX.Element|null} Modal component with various disclaimer sections or null if not open.
+ * @description
+ *   - The modal includes sections for service declaration, important notice, legal notice, and emergency contact.
+ *   - Only renders when `isOpen` is true; otherwise returns null.
+ *   - Styling and layout involve fixed positioning and responsive design practices.
+ */
 const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null
 

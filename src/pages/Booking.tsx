@@ -3,6 +3,18 @@ import { Calendar, Clock, MapPin, User, Phone, Mail, FileText, AlertTriangle } f
 import { saveBooking } from '../utils/storage'
 import { useCustomerAuth } from '../contexts/CustomerAuthContext'
 
+/**
+ * Handles input changes and booking form submissions for paramedical services.
+ * @example
+ * handleSubmit(event);
+ * // Alert: Booking request submitted successfully!
+ * @param {React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>} e - The event triggered by user input or form submission.
+ * @returns {void} This function does not return a value.
+ * @description
+ *   - Pre-fills customer information from authentication context when available.
+ *   - Ensures terms and conditions are agreed to before allowing submissions.
+ *   - Resets form fields upon successful booking and provides user feedback through alerts.
+ */
 const Booking = () => {
   const { customer } = useCustomerAuth()
   
@@ -43,6 +55,19 @@ const Booking = () => {
     }))
   }
 
+  /**
+   * Handles the submission of the booking form.
+   * @example
+   * handleSubmit(event)
+   * // Alerts 'Booking request submitted successfully!' if successful
+   * @param {React.FormEvent} e - The event triggered by form submission.
+   * @returns {void} No return value.
+   * @description
+   *   - Prevents the default form submission to handle it manually.
+   *   - Alerts user to agree to terms if they haven't done so.
+   *   - Attempts to save booking data and notifies the user of success or failure.
+   *   - Resets the form data and agreement checkbox upon successful booking.
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     

@@ -174,6 +174,19 @@ const AdminDashboard = () => {
     return <Navigate to="/admin/login" replace />
   }
 
+  /**
+   * Syncs the booking status and sends SMS notifications.
+   * @example
+   * sync("12345", "confirmed")
+   * undefined
+   * @param {string} id - The unique identifier of the booking.
+   * @param {Booking['status']} status - The new status of the booking to be synced.
+   * @returns {void} No return value.
+   * @description
+   *   - Locates the booking with the provided ID and updates its status.
+   *   - Sends an SMS notification if the status is 'confirmed' or 'cancelled'.
+   *   - Updates SMS logs upon successful SMS delivery.
+   */
   const handleBookingStatusUpdate = async (id: string, status: Booking['status']) => {
     const booking = bookings.find(b => b.id === id)
     if (!booking) return
@@ -218,6 +231,19 @@ const AdminDashboard = () => {
     }
   }
 
+  /**
+   * Synchronizes the assignments of bookings to staff members, sends notifications, and updates the UI accordingly.
+   * @example
+   * sync()
+   * undefined
+   * @param {void} - Function does not take any arguments.
+   * @returns {void} This function does not return a value.
+   * @description
+   *   - Ensure that `selectedBooking` and `assignmentForm.staffId` are defined before calling this function.
+   *   - Utilizes staff information to find the correct staff member for assignment.
+   *   - Attempts to send an SMS, logging errors without interrupting the flow.
+   *   - Resets the form and modal states after processing.
+   */
   const handleAssignBooking = async () => {
     if (!selectedBooking || !assignmentForm.staffId) return
 
@@ -283,6 +309,18 @@ const AdminDashboard = () => {
     setShowOfferForm(false)
   }
 
+  /**
+  * Handles form submission for adding or updating staff records
+  * @example
+  * handleStaffFormSubmit(event)
+  * // No return value
+  * @param {React.FormEvent} event - The form submission event.
+  * @returns {void} No return value.
+  * @description
+  *   - Prevents the default form submission behavior.
+  *   - Updates the staff record if an editingStaff object is provided.
+  *   - Resets staff form state and hides the form after processing.
+  */
   const handleStaffSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (editingStaff) {
@@ -317,6 +355,18 @@ const AdminDashboard = () => {
     setShowOfferForm(true)
   }
 
+  /**
+  * Updates the staff form with the details of the selected staff member.
+  * @example
+  * staffMember(sample_staff)
+  * // Form fields are populated with sample_staff details
+  * @param {Staff} staffMember - The staff member object containing individual details.
+  * @returns {void} Doesn't return anything; updates form state directly.
+  * @description
+  *   - Sets the editing staff context to the provided staff member.
+  *   - Populates the staff form with all details from the given staff member object.
+  *   - Toggles the form visibility to display the staff details.
+  */
   const handleEditStaff = (staffMember: Staff) => {
     setEditingStaff(staffMember)
     setStaffForm({
@@ -354,6 +404,18 @@ const AdminDashboard = () => {
     }))
   }
 
+  /**
+  * Returns appropriate CSS classes based on the given status string.
+  * @example
+  * getStatusClass('pending')
+  * // returns 'bg-yellow-100 text-yellow-800'
+  * @param {string} status - A string representing the current status.
+  * @returns {string} A string of CSS classes corresponding to the given status.
+  * @description
+  *   - Supports multiple status types such as 'pending', 'confirmed', 'completed', etc.
+  *   - Default classes are applied for unrecognized statuses.
+  *   - Shares the same CSS classes for certain statuses: 'new' and 'confirmed', 'read' and default cases.
+  */
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800'

@@ -2,6 +2,20 @@ import { Link } from 'react-router-dom'
 import { Syringe, TestTube, Ban as Bandage, Clock, Shield, Users, Star, CheckCircle, Phone, Calendar } from 'lucide-react'
 import DisclaimerModal from '../components/DisclaimerModal'
 
+/**
+ * Renders the homepage for Utkal Medpro featuring healthcare services and packages.
+ * @example
+ * HomePage()
+ * Returns JSX elements representing the homepage UI.
+ * @param {boolean} showDisclaimer - State variable that controls visibility of the disclaimer modal.
+ * @returns {JSX.Element} The complete homepage interface with disclaimer, hero section, stats, services, packages, and CTA sections.
+ * @description
+ *   - UseEffect is employed to check local storage for disclaimer visibility state and updates it based on user interaction.
+ *   - DisclaimerModal is rendered conditionally based on the showDisclaimer state.
+ *   - Hero section includes links for booking appointments and emergency calls.
+ *   - Services and packages are mapped to display detailed cards containing relevant information.
+ *   - Stats section showcases quick facts like the number of happy patients and availability time.
+ */
 const Home = () => {
   const [showDisclaimer, setShowDisclaimer] = useState(false)
 

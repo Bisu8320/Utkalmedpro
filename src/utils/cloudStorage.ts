@@ -8,8 +8,9 @@ interface CloudStorageConfig {
 }
 
 // Free JSONBin.io configuration
+// Note: This API key may be invalid - the service will gracefully fall back to local storage
 const CLOUD_CONFIG: CloudStorageConfig = {
-  apiKey: '$2a$10$8K8vwuQmyIeYy5WSfQVbeOUsYqg6.IRJF8z0BVXkwjpbMXpjy.BtC', // Free API key
+  apiKey: '$2a$10$8K8vwuQmyIeYy5WSfQVbeOUsYqg6.IRJF8z0BVXkwjpbMXpjy.BtC', // May need to be updated
   baseUrl: 'https://api.jsonbin.io/v3',
   binId: null // Will be created dynamically if needed
 }
@@ -76,6 +77,9 @@ const initializeCloudData = (): CloudData => ({
   lastUpdated: new Date().toISOString()
 })
 
+// Track cloud service availability
+let cloudServiceAvailable = true
+
 // Create a new bin if none exists
 const createNewBin = async (): Promise<string | null> => {
   try {
@@ -93,7 +97,13 @@ const createNewBin = async (): Promise<string | null> => {
     })
 
     if (!response.ok) {
-      console.error('Failed to create new bin:', response.status)
+      if (response.status === 401) {
+        console.warn('⚠️ JSONBin.io API key is invalid or expired. Cloud storage disabled.')
+        console.warn('💡 To enable cloud storage, obtain a new API key from https://jsonbin.io and update CLOUD_CONFIG.apiKey')
+        cloudServiceAvailable = false
+      } else {
+        console.error('Failed to create new bin:', response.status)
+      }
       return null
     }
 
@@ -105,15 +115,23 @@ const createNewBin = async (): Promise<string | null> => {
     CLOUD_CONFIG.binId = newBinId
     
     console.log('✅ Created new cloud storage bin:', newBinId)
+    cloudServiceAvailable = true
     return newBinId
   } catch (error) {
     console.error('Error creating new bin:', error)
+    console.warn('☁️ Cloud storage unavailable, using local storage only')
+    cloudServiceAvailable = false
     return null
   }
 }
 
 // Get or create bin ID
 const getBinId = async (): Promise<string | null> => {
+  // If cloud service is known to be unavailable, don't try
+  if (!cloudServiceAvailable) {
+    return null
+  }
+
   // Check if we have a stored bin ID
   const storedBinId = localStorage.getItem('utkal_medpro_bin_id')
   if (storedBinId) {
@@ -128,9 +146,15 @@ const getBinId = async (): Promise<string | null> => {
 // Fetch data from cloud storage
 export const fetchCloudData = async (): Promise<CloudData> => {
   try {
+    // If cloud service is unavailable, return local data immediately
+    if (!cloudServiceAvailable) {
+      console.log('☁️ Cloud storage disabled, using local data only')
+      return initializeCloudData()
+    }
+
     const binId = await getBinId()
     if (!binId) {
-      console.log('No cloud storage available, using local data only')
+      console.log('☁️ No cloud storage available, using local data only')
       return initializeCloudData()
     }
 
@@ -143,6 +167,11 @@ export const fetchCloudData = async (): Promise<CloudData> => {
     })
 
     if (!response.ok) {
+      if (response.status === 401) {
+        console.warn('⚠️ JSONBin.io authentication failed. Cloud storage disabled.')
+        cloudServiceAvailable = false
+        return initializeCloudData()
+      }
       if (response.status === 404) {
         console.log('Bin not found, creating new one...')
         // Clear the stored bin ID and try to create a new one
@@ -153,14 +182,17 @@ export const fetchCloudData = async (): Promise<CloudData> => {
           return await fetchCloudData() // Retry with new bin
         }
       }
-      console.log('Cloud storage not available, using local data')
+      console.log('☁️ Cloud storage not available, using local data')
       return initializeCloudData()
     }
 
     const result = await response.json()
+    cloudServiceAvailable = true
     return result.record || initializeCloudData()
   } catch (error) {
     console.error('Error fetching cloud data:', error)
+    console.log('☁️ Using local data only')
+    cloudServiceAvailable = false
     return initializeCloudData()
   }
 }
@@ -168,9 +200,15 @@ export const fetchCloudData = async (): Promise<CloudData> => {
 // Save data to cloud storage
 export const saveCloudData = async (data: CloudData): Promise<boolean> => {
   try {
+    // If cloud service is unavailable, don't try to save
+    if (!cloudServiceAvailable) {
+      console.log('☁️ Cloud storage disabled, data saved locally only')
+      return false
+    }
+
     const binId = await getBinId()
     if (!binId) {
-      console.log('No cloud storage available, data saved locally only')
+      console.log('☁️ No cloud storage available, data saved locally only')
       return false
     }
 
@@ -189,6 +227,11 @@ export const saveCloudData = async (data: CloudData): Promise<boolean> => {
     })
 
     if (!response.ok) {
+      if (response.status === 401) {
+        console.warn('⚠️ JSONBin.io authentication failed. Cloud storage disabled.')
+        cloudServiceAvailable = false
+        return false
+      }
       if (response.status === 404) {
         console.log('Bin not found, creating new one...')
         // Clear the stored bin ID and try to create a new one
@@ -203,10 +246,15 @@ export const saveCloudData = async (data: CloudData): Promise<boolean> => {
     }
 
     console.log('✅ Data saved to cloud successfully')
+    cloudServiceAvailable = true
     return true
   } catch (error) {
     console.error('❌ Error saving to cloud:', error)
-    console.log('Data will be stored locally only')
+    console.log('💾 Data will be stored locally only')
+    // Don't disable cloud service for network errors, only auth errors
+    if (error instanceof Error && error.message.includes('401')) {
+      cloudServiceAvailable = false
+    }
     return false
   }
 }
@@ -326,22 +374,34 @@ export const syncWithCloud = async (): Promise<void> => {
     localStorage.setItem('utkal_medpro_offers', JSON.stringify(cloudData.offers))
     localStorage.setItem('utkal_customers', JSON.stringify(cloudData.customers))
     
-    console.log('🔄 Local data synced with cloud')
+    if (cloudServiceAvailable) {
+      console.log('🔄 Local data synced with cloud')
+    } else {
+      console.log('💾 Using local data only (cloud storage unavailable)')
+    }
   } catch (error) {
     console.error('Error syncing with cloud:', error)
-    console.log('Using local data only')
+    console.log('💾 Using local data only')
   }
 }
 
-// Auto-sync every 30 seconds
+// Auto-sync every 30 seconds (only if cloud service is available)
 export const startAutoSync = () => {
-  setInterval(syncWithCloud, 30000)
+  setInterval(() => {
+    if (cloudServiceAvailable) {
+      syncWithCloud()
+    }
+  }, 30000)
   console.log('🔄 Auto-sync started (every 30 seconds)')
 }
 
 // Check cloud connection status
 export const checkCloudConnection = async (): Promise<boolean> => {
   try {
+    if (!cloudServiceAvailable) {
+      return false
+    }
+
     const binId = await getBinId()
     if (!binId) return false
 
@@ -351,8 +411,25 @@ export const checkCloudConnection = async (): Promise<boolean> => {
         'X-Master-Key': CLOUD_CONFIG.apiKey
       }
     })
-    return response.ok
+    
+    const isConnected = response.ok
+    if (!isConnected && response.status === 401) {
+      cloudServiceAvailable = false
+    }
+    
+    return isConnected
   } catch (error) {
     return false
   }
+}
+
+// Get cloud service status
+export const getCloudServiceStatus = (): boolean => {
+  return cloudServiceAvailable
+}
+
+// Reset cloud service availability (for testing or manual retry)
+export const resetCloudService = (): void => {
+  cloudServiceAvailable = true
+  console.log('🔄 Cloud service availability reset')
 }

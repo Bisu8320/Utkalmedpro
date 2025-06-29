@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Navigate } from 'react-router-dom'
 import { 
   Calendar, 
   Clock, 
   Users, 
   MessageSquare, 
-  TrendingUp, 
   Phone, 
-  Mail, 
   MapPin, 
   CheckCircle, 
   AlertCircle, 
   XCircle, 
-  UserPlus, 
   LogOut,
   RefreshCw,
   Bell,
@@ -25,7 +22,6 @@ import {
   updateBookingStatus, 
   assignBookingToStaff,
   getStaff, 
-  saveStaff, 
   updateStaff, 
   deleteStaff,
   getContactMessages, 

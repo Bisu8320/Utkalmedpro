@@ -7,9 +7,9 @@ export interface SMSConfig {
 
 // In production, these would come from environment variables
 const SMS_CONFIG: SMSConfig = {
-  apiKey: process.env.VITE_SMS_API_KEY || 'demo_api_key',
+  apiKey: import.meta.env.VITE_SMS_API_KEY || 'demo_api_key',
   senderId: 'UTKLMD',
-  baseUrl: process.env.VITE_SMS_API_URL || 'https://api.textlocal.in/send/'
+  baseUrl: import.meta.env.VITE_SMS_API_URL || 'https://api.textlocal.in/send/'
 }
 
 export const sendBookingConfirmationSMS = async (
@@ -37,7 +37,7 @@ export const sendBookingConfirmationSMS = async (
     await new Promise(resolve => setTimeout(resolve, 1000))
     
     // For demo, show alert (in production, this would be a real SMS)
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       alert(`📱 SMS Sent to ${phoneNumber}:\n\n${message}`)
     }
     
@@ -69,7 +69,7 @@ export const sendBookingCancellationSMS = async (
     
     await new Promise(resolve => setTimeout(resolve, 1000))
     
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       alert(`📱 Cancellation SMS Sent to ${phoneNumber}:\n\n${message}`)
     }
     
@@ -103,7 +103,7 @@ export const sendStaffAssignmentSMS = async (
     
     await new Promise(resolve => setTimeout(resolve, 1000))
     
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       alert(`📱 Staff Assignment SMS Sent to ${staffPhone}:\n\n${message}`)
     }
     
@@ -170,9 +170,9 @@ export const sendSMSViaTextlocal = async (phoneNumber: string, message: string) 
 
 // 2. Twilio API integration example
 export const sendSMSViaTwilio = async (phoneNumber: string, message: string) => {
-  const accountSid = process.env.VITE_TWILIO_ACCOUNT_SID
-  const authToken = process.env.VITE_TWILIO_AUTH_TOKEN
-  const fromNumber = process.env.VITE_TWILIO_PHONE_NUMBER
+  const accountSid = import.meta.env.VITE_TWILIO_ACCOUNT_SID
+  const authToken = import.meta.env.VITE_TWILIO_AUTH_TOKEN
+  const fromNumber = import.meta.env.VITE_TWILIO_PHONE_NUMBER
   
   const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
     method: 'POST',
@@ -192,8 +192,8 @@ export const sendSMSViaTwilio = async (phoneNumber: string, message: string) => 
 
 // 3. MSG91 API integration example
 export const sendSMSViaMSG91 = async (phoneNumber: string, message: string) => {
-  const authKey = process.env.VITE_MSG91_AUTH_KEY
-  const senderId = process.env.VITE_MSG91_SENDER_ID
+  const authKey = import.meta.env.VITE_MSG91_AUTH_KEY
+  const senderId = import.meta.env.VITE_MSG91_SENDER_ID
   
   const response = await fetch('https://api.msg91.com/api/sendhttp.php', {
     method: 'POST',

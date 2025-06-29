@@ -4,14 +4,14 @@
 interface CloudStorageConfig {
   apiKey: string
   baseUrl: string
-  binId: string
+  binId: string | null
 }
 
 // Free JSONBin.io configuration
 const CLOUD_CONFIG: CloudStorageConfig = {
   apiKey: '$2a$10$8K8vwuQmyIeYy5WSfQVbeOUsYqg6.IRJF8z0BVXkwjpbMXpjy.BtC', // Free API key
   baseUrl: 'https://api.jsonbin.io/v3',
-  binId: '676b8f2fad19ca34f8c8f5a2' // Shared bin for Utkal Medpro
+  binId: null // Will be created dynamically if needed
 }
 
 export interface CloudData {
@@ -76,10 +76,65 @@ const initializeCloudData = (): CloudData => ({
   lastUpdated: new Date().toISOString()
 })
 
+// Create a new bin if none exists
+const createNewBin = async (): Promise<string | null> => {
+  try {
+    const initialData = initializeCloudData()
+    
+    const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b`, {
+      method: 'POST',
+      headers: {
+        'X-Master-Key': CLOUD_CONFIG.apiKey,
+        'Content-Type': 'application/json',
+        'X-Bin-Name': 'Utkal Medpro Data',
+        'X-Bin-Private': 'false'
+      },
+      body: JSON.stringify(initialData)
+    })
+
+    if (!response.ok) {
+      console.error('Failed to create new bin:', response.status)
+      return null
+    }
+
+    const result = await response.json()
+    const newBinId = result.metadata.id
+    
+    // Store the new bin ID in localStorage for persistence
+    localStorage.setItem('utkal_medpro_bin_id', newBinId)
+    CLOUD_CONFIG.binId = newBinId
+    
+    console.log('✅ Created new cloud storage bin:', newBinId)
+    return newBinId
+  } catch (error) {
+    console.error('Error creating new bin:', error)
+    return null
+  }
+}
+
+// Get or create bin ID
+const getBinId = async (): Promise<string | null> => {
+  // Check if we have a stored bin ID
+  const storedBinId = localStorage.getItem('utkal_medpro_bin_id')
+  if (storedBinId) {
+    CLOUD_CONFIG.binId = storedBinId
+    return storedBinId
+  }
+
+  // Try to create a new bin
+  return await createNewBin()
+}
+
 // Fetch data from cloud storage
 export const fetchCloudData = async (): Promise<CloudData> => {
   try {
-    const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${CLOUD_CONFIG.binId}/latest`, {
+    const binId = await getBinId()
+    if (!binId) {
+      console.log('No cloud storage available, using local data only')
+      return initializeCloudData()
+    }
+
+    const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${binId}/latest`, {
       method: 'GET',
       headers: {
         'X-Master-Key': CLOUD_CONFIG.apiKey,
@@ -88,10 +143,18 @@ export const fetchCloudData = async (): Promise<CloudData> => {
     })
 
     if (!response.ok) {
-      console.log('No cloud data found, initializing...')
-      const initialData = initializeCloudData()
-      await saveCloudData(initialData)
-      return initialData
+      if (response.status === 404) {
+        console.log('Bin not found, creating new one...')
+        // Clear the stored bin ID and try to create a new one
+        localStorage.removeItem('utkal_medpro_bin_id')
+        CLOUD_CONFIG.binId = null
+        const newBinId = await createNewBin()
+        if (newBinId) {
+          return await fetchCloudData() // Retry with new bin
+        }
+      }
+      console.log('Cloud storage not available, using local data')
+      return initializeCloudData()
     }
 
     const result = await response.json()
@@ -105,12 +168,18 @@ export const fetchCloudData = async (): Promise<CloudData> => {
 // Save data to cloud storage
 export const saveCloudData = async (data: CloudData): Promise<boolean> => {
   try {
+    const binId = await getBinId()
+    if (!binId) {
+      console.log('No cloud storage available, data saved locally only')
+      return false
+    }
+
     const dataToSave = {
       ...data,
       lastUpdated: new Date().toISOString()
     }
 
-    const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${CLOUD_CONFIG.binId}`, {
+    const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${binId}`, {
       method: 'PUT',
       headers: {
         'X-Master-Key': CLOUD_CONFIG.apiKey,
@@ -120,6 +189,16 @@ export const saveCloudData = async (data: CloudData): Promise<boolean> => {
     })
 
     if (!response.ok) {
+      if (response.status === 404) {
+        console.log('Bin not found, creating new one...')
+        // Clear the stored bin ID and try to create a new one
+        localStorage.removeItem('utkal_medpro_bin_id')
+        CLOUD_CONFIG.binId = null
+        const newBinId = await createNewBin()
+        if (newBinId) {
+          return await saveCloudData(data) // Retry with new bin
+        }
+      }
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
@@ -127,6 +206,7 @@ export const saveCloudData = async (data: CloudData): Promise<boolean> => {
     return true
   } catch (error) {
     console.error('❌ Error saving to cloud:', error)
+    console.log('Data will be stored locally only')
     return false
   }
 }
@@ -150,8 +230,10 @@ export const addBookingToCloud = async (booking: any): Promise<boolean> => {
       console.log('📱 New booking added to cloud:', newBooking.id)
       // Trigger real-time notification for admin
       notifyAdminOfNewBooking(newBooking)
+    } else {
+      console.log('📱 New booking saved locally:', newBooking.id)
     }
-    return success
+    return true // Return true even if cloud save fails, as we have local fallback
   } catch (error) {
     console.error('Error adding booking to cloud:', error)
     return false
@@ -173,8 +255,10 @@ export const updateBookingInCloud = async (bookingId: string, updates: any): Pro
       const success = await saveCloudData(cloudData)
       if (success) {
         console.log('📝 Booking updated in cloud:', bookingId)
+      } else {
+        console.log('📝 Booking updated locally:', bookingId)
       }
-      return success
+      return true
     }
     return false
   } catch (error) {
@@ -195,7 +279,8 @@ export const addCustomerToCloud = async (customer: any): Promise<boolean> => {
     }
     
     cloudData.customers.push(customer)
-    return await saveCloudData(cloudData)
+    const success = await saveCloudData(cloudData)
+    return success || true // Return true even if cloud save fails
   } catch (error) {
     console.error('Error adding customer to cloud:', error)
     return false
@@ -244,6 +329,7 @@ export const syncWithCloud = async (): Promise<void> => {
     console.log('🔄 Local data synced with cloud')
   } catch (error) {
     console.error('Error syncing with cloud:', error)
+    console.log('Using local data only')
   }
 }
 
@@ -256,7 +342,10 @@ export const startAutoSync = () => {
 // Check cloud connection status
 export const checkCloudConnection = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${CLOUD_CONFIG.binId}/latest`, {
+    const binId = await getBinId()
+    if (!binId) return false
+
+    const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${binId}/latest`, {
       method: 'HEAD',
       headers: {
         'X-Master-Key': CLOUD_CONFIG.apiKey

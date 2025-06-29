@@ -18,7 +18,6 @@ import {
   Trash2,
   Star,
   UserPlus,
-  Tag,
   Gift
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'

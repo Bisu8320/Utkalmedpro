@@ -19,12 +19,8 @@ import {
   MessageCircle,
   UserPlus,
   UserCheck,
-  Send,
   Star,
-  Award,
-  Activity,
-  MapPin,
-  Briefcase
+  MapPin
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { 
@@ -61,7 +57,6 @@ const AdminDashboard = () => {
   const [offers, setOffers] = useState<Offer[]>([])
   const [messages, setMessages] = useState<ContactMessage[]>([])
   const [staff, setStaff] = useState<Staff[]>([])
-  const [staffMessages, setStaffMessages] = useState<StaffMessage[]>([])
   const [smsLogs, setSmsLogs] = useState<any[]>([])
   const [showOfferForm, setShowOfferForm] = useState(false)
   const [showStaffForm, setShowStaffForm] = useState(false)
@@ -134,7 +129,7 @@ const AdminDashboard = () => {
       }
 
       const handleStaffMessagesUpdate = () => {
-        setStaffMessages(getStaffMessages())
+        // Staff messages functionality can be implemented later
         setLastUpdate(new Date())
       }
 
@@ -165,7 +160,6 @@ const AdminDashboard = () => {
     setOffers(getOffers())
     setMessages(getContactMessages())
     setStaff(getStaff())
-    setStaffMessages(getStaffMessages())
     setSmsLogs(getSMSLogs())
     setLastUpdate(new Date())
   }

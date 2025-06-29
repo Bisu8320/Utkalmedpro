@@ -37,13 +37,13 @@ import {
 import { 
   sendBookingConfirmationSMS, 
   sendBookingCancellationSMS, 
-  sendStaffAssignmentSMS,
-  requestNotificationPermission
+  sendStaffAssignmentSMS
 } from '../utils/smsService'
 import { 
   checkCloudConnection, 
   syncWithCloud,
-  fetchCloudData 
+  fetchCloudData,
+  requestNotificationPermission
 } from '../utils/cloudStorage'
 import { Booking, Staff, ContactMessage, Offer } from '../types'
 

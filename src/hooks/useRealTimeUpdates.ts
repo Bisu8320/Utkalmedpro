@@ -25,7 +25,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions) {
   const [isConnected, setIsConnected] = useState(false)
   const [reconnectAttempts, setReconnectAttempts] = useState(0)
   const wsRef = useRef<WebSocket | null>(null)
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const reconnectTimeoutRef = useRef<number | null>(null)
 
   const connect = () => {
     try {
@@ -60,7 +60,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions) {
         
         // Attempt to reconnect
         if (reconnectAttempts < maxReconnectAttempts) {
-          reconnectTimeoutRef.current = setTimeout(() => {
+          reconnectTimeoutRef.current = window.setTimeout(() => {
             setReconnectAttempts(prev => prev + 1)
             connect()
           }, reconnectInterval)

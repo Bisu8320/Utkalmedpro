@@ -1,13 +1,4 @@
 import { Booking, Offer, ContactMessage, Staff, StaffMessage } from '../types'
-import { 
-  fetchCloudData, 
-  saveCloudData, 
-  addBookingToCloud, 
-  updateBookingInCloud,
-  addCustomerToCloud,
-  syncWithCloud,
-  startAutoSync
-} from './cloudStorage'
 
 // Local storage keys
 const BOOKINGS_KEY = 'utkal_medpro_bookings'
@@ -47,29 +38,16 @@ const notifyListeners = (key: string) => {
   }
 }
 
-// Initialize with cloud data
-export const initializeSampleData = async () => {
-  try {
-    console.log('🌐 Initializing cloud storage...')
-    
-    // Start auto-sync for real-time updates
-    startAutoSync()
-    
-    // Sync with cloud on startup
-    await syncWithCloud()
-    
-    console.log('✅ Cloud storage initialized successfully')
-  } catch (error) {
-    console.error('❌ Error initializing cloud storage:', error)
-    // Fallback to local storage if cloud fails
-    initializeLocalData()
-  }
-}
-
-// Fallback local initialization
-const initializeLocalData = () => {
+// Initialize with sample data if empty
+export const initializeSampleData = () => {
+  // Check if data already exists to avoid overwriting
   const existingBookings = localStorage.getItem(BOOKINGS_KEY)
+  const existingMessages = localStorage.getItem(MESSAGES_KEY)
+  const existingOffers = localStorage.getItem(OFFERS_KEY)
+  const existingStaff = localStorage.getItem(STAFF_KEY)
+
   if (!existingBookings) {
+    // Add sample bookings for demonstration
     const sampleBookings: Booking[] = [
       {
         id: '1',
@@ -84,40 +62,170 @@ const initializeLocalData = () => {
         status: 'pending',
         createdAt: new Date().toISOString(),
         price: '₹299'
+      },
+      {
+        id: '2',
+        service: 'Home Injection',
+        name: 'Sarah Smith',
+        phone: '+91 8765432109',
+        email: 'sarah.smith@example.com',
+        address: '456 Park Avenue, Cuttack, Odisha - 753001',
+        date: '2024-01-16',
+        time: '02:00 PM',
+        notes: 'Insulin injection - daily schedule',
+        status: 'confirmed',
+        createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+        price: '₹199',
+        assignedStaffId: '1',
+        assignedStaffName: 'Dr. Priya Sharma'
+      },
+      {
+        id: '3',
+        service: 'Wound Dressing',
+        name: 'Raj Patel',
+        phone: '+91 7654321098',
+        email: 'raj.patel@example.com',
+        address: '789 Hospital Road, Khordha, Odisha - 752050',
+        date: '2024-01-17',
+        time: '11:00 AM',
+        notes: 'Post-surgery wound care',
+        status: 'completed',
+        createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+        price: '₹499',
+        assignedStaffId: '2',
+        assignedStaffName: 'Nurse Amit Kumar'
       }
     ]
     localStorage.setItem(BOOKINGS_KEY, JSON.stringify(sampleBookings))
   }
+
+  if (!existingMessages) {
+    // Add sample contact messages
+    const sampleMessages: ContactMessage[] = [
+      {
+        id: '1',
+        name: 'Priya Sharma',
+        email: 'priya.sharma@example.com',
+        phone: '+91 9988776655',
+        subject: 'Service Inquiry',
+        message: 'I would like to know more about your blood collection services. Do you provide services on weekends?',
+        status: 'new',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: '2',
+        name: 'Amit Kumar',
+        email: 'amit.kumar@example.com',
+        phone: '+91 8877665544',
+        subject: 'Emergency Request',
+        message: 'Need urgent wound dressing service for my elderly father. Please contact immediately.',
+        status: 'replied',
+        createdAt: new Date(Date.now() - 43200000).toISOString() // 12 hours ago
+      }
+    ]
+    localStorage.setItem(MESSAGES_KEY, JSON.stringify(sampleMessages))
+  }
+
+  if (!existingOffers) {
+    // Add sample offers
+    const sampleOffers: Offer[] = [
+      {
+        id: '1',
+        title: 'New Year Health Package',
+        description: 'Complete health checkup at your doorstep with 30% discount',
+        discount: '30% OFF',
+        validUntil: '2024-01-31',
+        isActive: true,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: '2',
+        title: 'Senior Citizen Care',
+        description: 'Special discount for elderly care services',
+        discount: '₹200 OFF',
+        validUntil: '2024-02-15',
+        isActive: true,
+        createdAt: new Date().toISOString()
+      }
+    ]
+    localStorage.setItem(OFFERS_KEY, JSON.stringify(sampleOffers))
+  }
+
+  if (!existingStaff) {
+    // Add sample staff members
+    const sampleStaff: Staff[] = [
+      {
+        id: '1',
+        name: 'Dr. Priya Sharma',
+        phone: '+91 9876543210',
+        email: 'priya.sharma@utkalmedpro.com',
+        specialization: ['Blood Collection', 'Health Monitoring', 'Injections'],
+        experience: '5 years',
+        qualification: 'B.Sc Nursing, Certified Phlebotomist',
+        isActive: true,
+        currentBookings: 3,
+        totalCompleted: 245,
+        rating: 4.8,
+        joinedDate: '2022-01-15',
+        address: 'Bhubaneswar, Odisha',
+        emergencyContact: '+91 9876543211'
+      },
+      {
+        id: '2',
+        name: 'Nurse Amit Kumar',
+        phone: '+91 8765432109',
+        email: 'amit.kumar@utkalmedpro.com',
+        specialization: ['Wound Dressing', 'Post-Surgery Care', 'Elderly Care'],
+        experience: '7 years',
+        qualification: 'GNM, Wound Care Specialist',
+        isActive: true,
+        currentBookings: 2,
+        totalCompleted: 312,
+        rating: 4.9,
+        joinedDate: '2021-06-10',
+        address: 'Cuttack, Odisha',
+        emergencyContact: '+91 8765432110'
+      },
+      {
+        id: '3',
+        name: 'Technician Ravi Patel',
+        phone: '+91 7654321098',
+        email: 'ravi.patel@utkalmedpro.com',
+        specialization: ['Blood Collection', 'Sample Handling', 'Lab Coordination'],
+        experience: '3 years',
+        qualification: 'Diploma in Medical Lab Technology',
+        isActive: true,
+        currentBookings: 1,
+        totalCompleted: 156,
+        rating: 4.7,
+        joinedDate: '2023-03-20',
+        address: 'Khordha, Odisha',
+        emergencyContact: '+91 7654321099'
+      }
+    ]
+    localStorage.setItem(STAFF_KEY, JSON.stringify(sampleStaff))
+  }
 }
 
-// Enhanced booking functions with cloud sync
-export const saveBooking = async (booking: Omit<Booking, 'id' |'status'| 'createdAt'>): Promise<Booking> => {
+// Booking functions
+export const saveBooking = (booking: Omit<Booking, 'id' |'status'| 'createdAt'>): Booking => {
   try {
-    // Save to cloud first
-    const success = await addBookingToCloud(booking)
-    
-    if (success) {
-      // Also save locally for offline access
-      const bookings = getBookings()
-      const newBooking: Booking = {
-        ...booking,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        status: 'pending'
-      }
-      bookings.push(newBooking)
-      localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
-      
-      // Notify listeners
-      setTimeout(() => {
-        notifyListeners(BOOKINGS_KEY)
-      }, 100)
-      
-      console.log('📱 Booking saved to cloud and local storage')
-      return newBooking
-    } else {
-      throw new Error('Failed to save booking to cloud')
+    const bookings = getBookings()
+    const newBooking: Booking = {
+      ...booking,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      status: 'pending'
     }
+    bookings.push(newBooking)
+    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
+    
+    // Notify listeners after successful save
+    setTimeout(() => {
+      notifyListeners(BOOKINGS_KEY)
+    }, 100)
+    
+    return newBooking
   } catch (error) {
     console.error('Error saving booking:', error)
     throw error
@@ -134,12 +242,8 @@ export const getBookings = (): Booking[] => {
   }
 }
 
-export const updateBookingStatus = async (id: string, status: Booking['status']): Promise<void> => {
+export const updateBookingStatus = (id: string, status: Booking['status']): void => {
   try {
-    // Update in cloud
-    await updateBookingInCloud(id, { status })
-    
-    // Update locally
     const bookings = getBookings()
     const index = bookings.findIndex(b => b.id === id)
     if (index !== -1) {
@@ -147,38 +251,27 @@ export const updateBookingStatus = async (id: string, status: Booking['status'])
       localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
       notifyListeners(BOOKINGS_KEY)
     }
-    
-    console.log(`📝 Booking ${id} status updated to ${status}`)
   } catch (error) {
     console.error('Error updating booking status:', error)
   }
 }
 
-export const assignBookingToStaff = async (bookingId: string, staffId: string, staffName: string, notes?: string): Promise<void> => {
+export const assignBookingToStaff = (bookingId: string, staffId: string, staffName: string, notes?: string): void => {
   try {
-    const updates = {
-      assignedStaffId: staffId,
-      assignedStaffName: staffName,
-      status: 'confirmed',
-      ...(notes && { staffNotes: notes })
-    }
-    
-    // Update in cloud
-    await updateBookingInCloud(bookingId, updates)
-    
-    // Update locally
     const bookings = getBookings()
     const index = bookings.findIndex(b => b.id === bookingId)
     if (index !== -1) {
-      Object.assign(bookings[index], updates)
+      bookings[index].assignedStaffId = staffId
+      bookings[index].assignedStaffName = staffName
+      if (notes) {
+        bookings[index].staffNotes = notes
+      }
       localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings))
       notifyListeners(BOOKINGS_KEY)
       
       // Update staff current bookings count
       updateStaffBookingCount(staffId, 1)
     }
-    
-    console.log(`👨‍⚕️ Booking ${bookingId} assigned to ${staffName}`)
   } catch (error) {
     console.error('Error assigning booking to staff:', error)
   }
@@ -396,34 +489,6 @@ export const updateMessageStatus = (id: string, status: ContactMessage['status']
     }
   } catch (error) {
     console.error('Error updating message status:', error)
-  }
-}
-
-// Customer functions with cloud sync
-export const saveCustomer = async (customer: any): Promise<boolean> => {
-  try {
-    // Save to cloud
-    await addCustomerToCloud(customer)
-    
-    // Save locally
-    const customers = getCustomers()
-    customers.push(customer)
-    localStorage.setItem('utkal_customers', JSON.stringify(customers))
-    
-    return true
-  } catch (error) {
-    console.error('Error saving customer:', error)
-    return false
-  }
-}
-
-const getCustomers = () => {
-  try {
-    const stored = localStorage.getItem('utkal_customers')
-    return stored ? JSON.parse(stored) : []
-  } catch (error) {
-    console.error('Error getting customers:', error)
-    return []
   }
 }
 

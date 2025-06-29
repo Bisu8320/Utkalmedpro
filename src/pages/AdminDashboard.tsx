@@ -23,7 +23,6 @@ import {
   assignBookingToStaff,
   getStaff, 
   getContactMessages, 
-  getOffers, 
   addStorageListener,
   removeStorageListener,
   BOOKINGS_KEY
@@ -39,7 +38,7 @@ import {
   fetchCloudData,
   requestNotificationPermission
 } from '../utils/cloudStorage'
-import { Booking, Staff, ContactMessage, Offer } from '../types'
+import { Booking, Staff, ContactMessage } from '../types'
 
 const AdminDashboard = () => {
   const { isAuthenticated, logout } = useAuth()
@@ -79,7 +78,6 @@ const AdminDashboard = () => {
         setBookings(getBookings())
         setStaff(getStaff())
         setMessages(getContactMessages())
-        getOffers()
         console.log('📊 Data loaded from local storage (fallback)')
       }
       

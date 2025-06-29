@@ -9,7 +9,6 @@ const CustomerLogin = () => {
   const [otp, setOtp] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [otpSent, setOtpSent] = useState(false)
   
   const { isAuthenticated, login, sendOTP } = useCustomerAuth()
 
@@ -34,7 +33,6 @@ const CustomerLogin = () => {
       const success = await sendOTP(phone)
       if (success) {
         setStep('otp')
-        setOtpSent(true)
       } else {
         setError('Failed to send OTP. Please try again.')
       }
@@ -75,7 +73,6 @@ const CustomerLogin = () => {
     try {
       const success = await sendOTP(phone)
       if (success) {
-        setOtpSent(true)
         alert('OTP sent successfully!')
       } else {
         setError('Failed to resend OTP. Please try again.')

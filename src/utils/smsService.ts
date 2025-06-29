@@ -192,7 +192,6 @@ export const sendSMSViaTwilio = async (phoneNumber: string, message: string) => 
 
 // 3. MSG91 API integration example
 export const sendSMSViaMSG91 = async (phoneNumber: string, message: string) => {
-  const authKey = import.meta.env.VITE_MSG91_AUTH_KEY
   const senderId = import.meta.env.VITE_MSG91_SENDER_ID
   
   const response = await fetch('https://api.msg91.com/api/sendhttp.php', {

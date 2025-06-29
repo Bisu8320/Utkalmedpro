@@ -24,7 +24,6 @@ import {
   getStaff, 
   getContactMessages, 
   getOffers, 
-  deleteOffer,
   addStorageListener,
   removeStorageListener,
   BOOKINGS_KEY
@@ -48,7 +47,6 @@ const AdminDashboard = () => {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [staff, setStaff] = useState<Staff[]>([])
   const [messages, setMessages] = useState<ContactMessage[]>([])
-  const [offers, setOffers] = useState<Offer[]>([])
   const [loading, setLoading] = useState(true)
   const [cloudConnected, setCloudConnected] = useState(false)
   const [newBookingCount, setNewBookingCount] = useState(0)
@@ -75,14 +73,13 @@ const AdminDashboard = () => {
         setBookings(cloudData.bookings || [])
         setStaff(cloudData.staff || [])
         setMessages(cloudData.messages || [])
-        setOffers(cloudData.offers || [])
         console.log('📊 Data loaded from cloud storage')
       } catch (error) {
         // Fallback to local storage
         setBookings(getBookings())
         setStaff(getStaff())
         setMessages(getContactMessages())
-        setOffers(getOffers())
+        getOffers()
         console.log('📊 Data loaded from local storage (fallback)')
       }
       

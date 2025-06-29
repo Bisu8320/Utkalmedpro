@@ -8,9 +8,8 @@ interface CloudStorageConfig {
 }
 
 // Free JSONBin.io configuration
-// Note: This API key may be invalid - the service will gracefully fall back to local storage
 const CLOUD_CONFIG: CloudStorageConfig = {
-  apiKey: '$2a$10$8K8vwuQmyIeYy5WSfQVbeOUsYqg6.IRJF8z0BVXkwjpbMXpjy.BtC', // May need to be updated
+  apiKey: '$2a$10$QND8QWOetI0wUdDSZjzhZuLOtq7AtgT.BJp1arndvPv0qGMjWS32K',
   baseUrl: 'https://api.jsonbin.io/v3',
   binId: null // Will be created dynamically if needed
 }

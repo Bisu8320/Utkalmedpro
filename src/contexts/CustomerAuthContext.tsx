@@ -6,6 +6,7 @@ interface Customer {
   name: string
   phone: string
   email: string
+  password?: string
   createdAt: string
 }
 
@@ -113,11 +114,38 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       const customers = getCustomers()
       
-      // Check if customer already exists
-      if (customers.find(c => c.phone === customerData.phone)) {
-        return false
+      // Check if customer already exists by phone or email
+      const existingByPhone = customers.find(c => c.phone === customerData.phone)
+      const existingByEmail = customerData.email ? customers.find(c => c.email === customerData.email) : null
+      
+      if (existingByPhone || existingByEmail) {
+        // Update existing customer instead of creating new one
+        const existingCustomer = existingByPhone || existingByEmail
+        if (existingCustomer) {
+          const updatedCustomer = {
+            ...existingCustomer,
+            ...customerData,
+            id: existingCustomer.id,
+            createdAt: existingCustomer.createdAt
+          }
+          
+          const customerIndex = customers.findIndex(c => c.id === existingCustomer.id)
+          customers[customerIndex] = updatedCustomer
+          localStorage.setItem('utkal_customers', JSON.stringify(customers))
+          
+          setCustomer(updatedCustomer)
+          setIsAuthenticated(true)
+          localStorage.setItem('utkal_customer_auth', JSON.stringify(updatedCustomer))
+          
+          // Save to cloud storage
+          await addCustomerToCloud(updatedCustomer)
+          console.log('🌐 Customer profile updated and saved to cloud')
+          
+          return true
+        }
       }
       
+      // Create new customer
       const newCustomer: Customer = {
         ...customerData,
         id: Date.now().toString(),

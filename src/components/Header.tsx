@@ -81,6 +81,12 @@ const Header = () => {
                   Login
                 </Link>
                 <Link
+                  to="/customer/signup"
+                  className="text-primary-600 hover:text-primary-700 text-sm font-medium transition-colors border border-primary-600 px-3 py-1 rounded-lg hover:bg-primary-50"
+                >
+                  Sign Up
+                </Link>
+                <Link
                   to="/booking"
                   className="btn-primary text-white px-6 py-2 rounded-lg text-sm font-medium"
                 >
@@ -149,6 +155,13 @@ const Header = () => {
                       className="text-gray-700 hover:text-primary-600 text-sm font-medium px-3 py-2 block"
                     >
                       Login
+                    </Link>
+                    <Link
+                      to="/customer/signup"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="text-primary-600 hover:text-primary-700 text-sm font-medium px-3 py-2 block border border-primary-600 mx-3 rounded-lg text-center hover:bg-primary-50"
+                    >
+                      Sign Up
                     </Link>
                     <Link
                       to="/booking"

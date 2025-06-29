@@ -11,6 +11,7 @@ import Contact from './pages/Contact'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import CustomerLogin from './pages/CustomerLogin'
+import CustomerSignup from './pages/CustomerSignup'
 import CustomerDashboard from './pages/CustomerDashboard'
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/customer/login" element={<CustomerLogin />} />
+              <Route path="/customer/signup" element={<CustomerSignup />} />
               <Route path="/customer/dashboard" element={<CustomerDashboard />} />
             </Routes>
           </main>

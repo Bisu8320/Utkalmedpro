@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Navigate, Link } from 'react-router-dom'
-import { Phone, Shield, ArrowRight, Clock } from 'lucide-react'
+import { Phone, Shield, ArrowRight, Clock, UserPlus } from 'lucide-react'
 import { useCustomerAuth } from '../contexts/CustomerAuthContext'
 
 const CustomerLogin = () => {
@@ -215,8 +215,8 @@ const CustomerLogin = () => {
         <div className="text-center">
           <p className="text-sm text-gray-500">
             New to Utkal Medpro?{' '}
-            <Link to="/booking" className="text-primary-600 hover:text-primary-500 font-medium">
-              Book a service
+            <Link to="/customer/signup" className="text-primary-600 hover:text-primary-500 font-medium">
+              Create account
             </Link>
           </p>
         </div>
@@ -229,6 +229,23 @@ const CustomerLogin = () => {
           <p className="text-sm text-blue-700 mt-1">
             Login to track your bookings, view service history, and manage your account.
           </p>
+        </div>
+
+        {/* Sign Up Promotion */}
+        <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 text-green-800 mb-2">
+            <UserPlus className="h-4 w-4" />
+            <span className="text-sm font-medium">Don't have an account?</span>
+          </div>
+          <p className="text-sm text-green-700 mb-3">
+            Create an account to enjoy faster bookings, track your health history, and get exclusive offers.
+          </p>
+          <Link
+            to="/customer/signup"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors inline-block"
+          >
+            Create Account
+          </Link>
         </div>
       </div>
     </div>

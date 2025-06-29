@@ -28,7 +28,9 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions) {
 
   const connect = () => {
     try {
-      const wsUrl = endpoint.startsWith('ws') ? endpoint : `ws://localhost:3001${endpoint}`
+      // Use environment variable for WebSocket URL, fallback to localhost for development
+      const wsBaseUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3001'
+      const wsUrl = endpoint.startsWith('ws') ? endpoint : `${wsBaseUrl}${endpoint}`
       const ws = new WebSocket(wsUrl)
       
       ws.onopen = () => {

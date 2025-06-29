@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { addCustomerToCloud } from '../utils/cloudStorage'
 
 interface Customer {
   id: string
@@ -48,7 +49,7 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       sessionStorage.setItem(`otp_${phone}_expires`, (Date.now() + 300000).toString()) // 5 minutes
       
       // Simulate SMS sending
-      console.log(`SMS sent to ${phone}: Your OTP is ${otp}`)
+      console.log(`📱 SMS sent to ${phone}: Your OTP is ${otp}`)
       alert(`Demo: Your OTP is ${otp} (In production, this would be sent via SMS)`)
       
       return true
@@ -87,6 +88,10 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
         customers.push(existingCustomer)
         localStorage.setItem('utkal_customers', JSON.stringify(customers))
+        
+        // Save to cloud storage
+        await addCustomerToCloud(existingCustomer)
+        console.log('🌐 New customer saved to cloud storage')
       }
       
       setCustomer(existingCustomer)
@@ -121,6 +126,10 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       
       customers.push(newCustomer)
       localStorage.setItem('utkal_customers', JSON.stringify(customers))
+      
+      // Save to cloud storage
+      await addCustomerToCloud(newCustomer)
+      console.log('🌐 New customer registered and saved to cloud')
       
       setCustomer(newCustomer)
       setIsAuthenticated(true)

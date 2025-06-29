@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Calendar, Clock, MapPin, User, Phone, Mail, FileText, AlertTriangle } from 'lucide-react'
+import { Calendar, Clock, MapPin, User, Phone, Mail, FileText, AlertTriangle, CheckCircle } from 'lucide-react'
 import { saveBooking } from '../utils/storage'
 import { useCustomerAuth } from '../contexts/CustomerAuthContext'
 
@@ -19,6 +19,8 @@ const Booking = () => {
 
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [showTerms, setShowTerms] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [bookingId, setBookingId] = useState('')
 
   const services = [
     { value: 'blood-collection', label: 'Blood Sample Collection', price: '₹299' },
@@ -59,8 +61,9 @@ const Booking = () => {
     }
     
     try {
-      saveBooking(bookingData)
-      alert('Booking request submitted successfully! We will contact you shortly to confirm. You can track your booking status by logging into your account.')
+      const newBooking = saveBooking(bookingData)
+      setBookingId(newBooking.id)
+      setShowSuccess(true)
       
       // Reset form
       setFormData({
@@ -81,6 +84,55 @@ const Booking = () => {
   }
 
   const selectedService = services.find(s => s.value === formData.service)
+
+  if (showSuccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+            <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Booking Successful!</h2>
+            <p className="text-gray-600 mb-6">
+              Your booking has been submitted successfully. We will contact you within 30 minutes to confirm your appointment.
+            </p>
+            <div className="bg-blue-50 p-4 rounded-lg mb-6">
+              <p className="text-sm text-blue-800">
+                <strong>Booking ID:</strong> #{bookingId}
+              </p>
+              <p className="text-sm text-blue-600 mt-1">
+                Save this ID for future reference
+              </p>
+            </div>
+            {customer && (
+              <div className="bg-green-50 p-4 rounded-lg mb-6">
+                <p className="text-sm text-green-800">
+                  📱 You can track your booking status in your dashboard
+                </p>
+              </div>
+            )}
+            <div className="space-y-3">
+              <button
+                onClick={() => setShowSuccess(false)}
+                className="w-full btn-primary text-white py-3 px-4 rounded-lg font-semibold"
+              >
+                Book Another Service
+              </button>
+              {customer && (
+                <a
+                  href="/customer/dashboard"
+                  className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-200 transition-colors block text-center"
+                >
+                  View Dashboard
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="py-20">

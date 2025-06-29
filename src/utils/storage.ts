@@ -1,11 +1,11 @@
 import { Booking, Offer, ContactMessage, Staff, StaffMessage } from '../types'
 
 // Local storage keys
-const BOOKINGS_KEY = 'utkal_medpro_bookings'
-const OFFERS_KEY = 'utkal_medpro_offers'
-const MESSAGES_KEY = 'utkal_medpro_messages'
-const STAFF_KEY = 'utkal_medpro_staff'
-const STAFF_MESSAGES_KEY = 'utkal_medpro_staff_messages'
+export const BOOKINGS_KEY = 'utkal_medpro_bookings'
+export const OFFERS_KEY = 'utkal_medpro_offers'
+export const MESSAGES_KEY = 'utkal_medpro_messages'
+export const STAFF_KEY = 'utkal_medpro_staff'
+export const STAFF_MESSAGES_KEY = 'utkal_medpro_staff_messages'
 
 // Event listeners for storage changes
 const storageListeners: { [key: string]: (() => void)[] } = {}
@@ -36,6 +36,9 @@ const notifyListeners = (key: string) => {
       }
     })
   }
+  
+  // Trigger custom event for real-time updates
+  window.dispatchEvent(new CustomEvent('storageUpdate', { detail: { key } }))
 }
 
 // Initialize with sample data if empty
@@ -134,7 +137,7 @@ export const initializeSampleData = () => {
         title: 'New Year Health Package',
         description: 'Complete health checkup at your doorstep with 30% discount',
         discount: '30% OFF',
-        validUntil: '2024-01-31',
+        validUntil: '2024-12-31',
         isActive: true,
         createdAt: new Date().toISOString()
       },
@@ -143,7 +146,7 @@ export const initializeSampleData = () => {
         title: 'Senior Citizen Care',
         description: 'Special discount for elderly care services',
         discount: '₹200 OFF',
-        validUntil: '2024-02-15',
+        validUntil: '2024-12-15',
         isActive: true,
         createdAt: new Date().toISOString()
       }
@@ -223,6 +226,10 @@ export const saveBooking = (booking: Omit<Booking, 'id' |'status'| 'createdAt'>)
     // Notify listeners after successful save
     setTimeout(() => {
       notifyListeners(BOOKINGS_KEY)
+      // Trigger real-time notification for admin
+      window.dispatchEvent(new CustomEvent('newBookingReceived', { 
+        detail: { booking: newBooking } 
+      }))
     }, 100)
     
     return newBooking
@@ -491,6 +498,3 @@ export const updateMessageStatus = (id: string, status: ContactMessage['status']
     console.error('Error updating message status:', error)
   }
 }
-
-// Storage keys for listeners
-export { BOOKINGS_KEY, OFFERS_KEY, MESSAGES_KEY, STAFF_KEY, STAFF_MESSAGES_KEY }

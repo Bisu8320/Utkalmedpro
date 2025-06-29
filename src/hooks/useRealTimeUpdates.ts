@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { API_CONFIG } from '../config/api'
 
 interface UseRealTimeUpdatesOptions {
   endpoint: string
@@ -28,9 +29,12 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions) {
 
   const connect = () => {
     try {
-      // Use environment variable for WebSocket URL, fallback to localhost for development
-      const wsBaseUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3001'
+      // Derive WebSocket URL from API_CONFIG.baseURL to ensure consistency
+      const apiUrl = new URL(API_CONFIG.baseURL)
+      const wsProtocol = apiUrl.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsBaseUrl = `${wsProtocol}//${apiUrl.host}`
       const wsUrl = endpoint.startsWith('ws') ? endpoint : `${wsBaseUrl}${endpoint}`
+      
       const ws = new WebSocket(wsUrl)
       
       ws.onopen = () => {

@@ -23,7 +23,6 @@ dotenv.config()
 
 const app = express()
 const server = createServer(app)
-const wss = new WebSocketServer({ server })
 
 // Rate limiting
 const limiter = rateLimit({
@@ -62,6 +61,12 @@ app.use('/api/offers', offerRoutes)
 app.use('/api/messages', messageRoutes)
 app.use('/api/admin', adminRoutes)
 
+// WebSocket server with proper path configuration
+const wss = new WebSocketServer({ 
+  server,
+  path: '/ws/updates'
+})
+
 // WebSocket setup
 setupWebSocket(wss)
 
@@ -81,7 +86,7 @@ const PORT = process.env.PORT || 3001
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`)
   console.log(`📊 Health check: http://localhost:${PORT}/health`)
-  console.log(`🔌 WebSocket server ready`)
+  console.log(`🔌 WebSocket server ready on /ws/updates`)
 })
 
 // Graceful shutdown

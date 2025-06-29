@@ -301,7 +301,7 @@ const Home = () => {
             >
               <Phone className="h-5 w-5" />
               <span>Call Now</span>
-            </Link>
+            </a>
           </div>
         </div>
       </section>

@@ -44,44 +44,24 @@ const Home = () => {
     }
   ]
 
-  const packages = [
+  const packageImages = [
     {
-      name: 'Womens Health Screening ',
+      title: 'Women\'s Health Screening',
       price: 'Worth ₹999 just at ₹499',
-      popular: false,
-      features: [
-        'Thyroid Function Test',
-        'Complete Blood Count',
-        'Calcium',
-        'Fasting / Random Blood Sugar'
-      ]
+      image: 'https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=600',
+      description: 'Comprehensive health package for women'
     },
     {
-      name: 'Premium Care',
-      price: '₹499',
-      period: 'per month',
-      popular: true,
-      features: [
-        'Up to 4 visits per month',
-        'Priority booking',
-        'Detailed health reports',
-        'support',
-        'Free consultation calls'
-      ]
+      title: 'Premium Care Package',
+      price: 'Starting from ₹499',
+      image: 'https://images.pexels.com/photos/4173624/pexels-photo-4173624.jpeg?auto=compress&cs=tinysrgb&w=600',
+      description: 'Complete healthcare at your doorstep'
     },
     {
-      name: 'Family Care',
-      price: '₹999',
-      period: 'per month',
-      popular: false,
-      features: [
-        'Unlimited visits for family',
-        'Dedicated care coordinator',
-        'Health monitoring',
-        'Emergency response',
-        'Medication management',
-        'Monthly health checkup'
-      ]
+      title: 'Family Care Package',
+      price: 'Starting from ₹999',
+      image: 'https://images.pexels.com/photos/4173239/pexels-photo-4173239.jpeg?auto=compress&cs=tinysrgb&w=600',
+      description: 'Healthcare solutions for the entire family'
     }
   ]
 
@@ -201,55 +181,38 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Packages Section */}
+      {/* Package Images Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Choose Your Care Package
+              Our Healthcare Packages
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Flexible packages designed to meet your healthcare needs and budget. 
-              All packages include certified professionals and quality equipment.
+              Comprehensive healthcare solutions designed for your needs
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {packages.map((pkg, index) => (
-              <div
-                key={index}
-                className={`package-card bg-white rounded-2xl shadow-lg overflow-hidden ${
-                  pkg.popular ? 'ring-2 ring-primary-500 transform scale-105' : ''
-                }`}
-              >
-                {pkg.popular && (
-                  <div className="bg-primary-500 text-white text-center py-2 text-sm font-semibold">
-                    Most Popular
-                  </div>
-                )}
-                <div className="p-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{pkg.name}</h3>
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold text-primary-600">{pkg.price}</span>
-                    <span className="text-gray-600 ml-2">{pkg.period}</span>
-                  </div>
-                  <ul className="space-y-3 mb-8">
-                    {pkg.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                        <span className="text-gray-600">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+            {packageImages.map((pkg, index) => (
+              <div key={index} className="relative group overflow-hidden rounded-2xl shadow-lg">
+                <img
+                  src={pkg.image}
+                  alt={pkg.title}
+                  className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                  <h3 className="text-xl font-bold mb-2">{pkg.title}</h3>
+                  <p className="text-sm text-gray-200 mb-2">{pkg.description}</p>
+                  <p className="text-lg font-semibold text-blue-200">{pkg.price}</p>
+                </div>
+                <div className="absolute top-4 right-4">
                   <Link
                     to="/booking"
-                    className={`w-full py-3 px-6 rounded-lg font-semibold text-center block transition-all duration-300 ${
-                      pkg.popular
-                        ? 'btn-primary text-white'
-                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                    }`}
+                    className="bg-white text-primary-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-50 transition-colors"
                   >
-                    Choose Plan
+                    Book Now
                   </Link>
                 </div>
               </div>
@@ -338,7 +301,7 @@ const Home = () => {
             >
               <Phone className="h-5 w-5" />
               <span>Call Now</span>
-            </a>
+            </Link>
           </div>
         </div>
       </section>

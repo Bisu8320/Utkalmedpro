@@ -12,7 +12,9 @@
     "backend:build": "cd backend && npm run build",
     "backend:start": "cd backend && npm start",
     "full:dev": "concurrently \"npm run dev\" \"npm run backend:dev\"",
-    "full:build": "npm run build && npm run backend:build"
+    "full:build": "npm run build && npm run backend:build",
+    "deploy:aws": "chmod +x aws/deploy.sh && ./aws/deploy.sh",
+    "setup:aws": "chmod +x aws/ec2-setup.sh && ./aws/ec2-setup.sh"
   },
   "dependencies": {
     "react": "^18.2.0",

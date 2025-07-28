@@ -1,0 +1,6 @@
+{
+    "watch": ["controllers", "routes",".env"],
+    "ignore": ["node_modules", "logs", ".git"],
+    "ext": "ts,json",
+    "exec": "ts-node server.ts"
+}

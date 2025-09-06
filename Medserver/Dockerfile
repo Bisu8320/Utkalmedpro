@@ -3,13 +3,14 @@ FROM node:18
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy the Medserver directory to the container
+COPY Medserver ./Medserver
+
+# Set working directory to the Medserver subdirectory
+WORKDIR /app/Medserver
 
 # Install dependencies
 RUN npm install
-
-# Copy the rest of your code
-COPY . .
 
 # Build TypeScript (if you're using tsc to compile)
 RUN npm run build

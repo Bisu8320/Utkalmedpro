@@ -13,6 +13,7 @@ WORKDIR /app/Medserver
 RUN npm install
 
 # Build TypeScript (if you're using tsc to compile)
+)
 RUN npm run build
 
 # Expose port

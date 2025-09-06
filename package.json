@@ -1,0 +1,22 @@
+{
+  "name": "utkal-medpro",
+  "version": "1.0.0",
+  "description": "Utkal Medpro - Medical Services Booking Platform",
+  "private": true,
+  "scripts": {
+    "dev": "cd Medserver && npm run dev",
+    "start": "cd Medserver && npm run start",
+    "build": "cd Medserver && npm run build",
+    "clean": "cd Medserver && npm run clean",
+    "test": "cd Medserver && npm run test",
+    "install-backend": "cd Medserver && npm install",
+    "install-all": "npm run install-backend"
+  },
+  "keywords": ["medical", "booking", "healthcare", "nodejs", "express"],
+  "author": "Utkal Medpro",
+  "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

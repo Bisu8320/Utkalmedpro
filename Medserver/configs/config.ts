@@ -9,4 +9,6 @@ export const Configs = {
     TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN || '',
     TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER || '',
     ADMIN_PHONE_NUMBER: process.env.ADMIN_PHONE_NUMBER || '',
+    EMAIL_USER: process.env.EMAIL_USER || '',
+    EMAIL_PASS: process.env.EMAIL_PASS || '',
   };

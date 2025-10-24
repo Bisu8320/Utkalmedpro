@@ -38,14 +38,34 @@ export const prepareSms = async (
   customerTime: string,
   customerAdditionalNotes: string
 ): Promise<void> => {
-  const adminSMS = `📩Hey Admin New Booking Request From ${customerName}\nPhone: ${customerPhoneNumber}`;
+  const adminWhatsAppMessage = `🏥 *NEW BOOKING REQUEST - UTKAL MEDPRO*
+
+👤 *Customer Details:*
+• Name: ${customerName}
+• Phone: ${customerPhoneNumber}
+• Email: ${customerEmail || 'Not provided'}
+
+📍 *Service Address:*
+${customerAddress}
+
+🩺 *Service Details:*
+• Service: ${serviceName}
+• Date: ${customerDate}
+• Time: ${customerTime}
+
+${customerAdditionalNotes ? `📝 *Additional Notes:*
+${customerAdditionalNotes}
+
+` : ''}📅 *Booking Time:* ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+
+Please contact the customer to confirm the appointment.`;
 
   const customerSMS = `Hi ${customerName}, your booking request has been received! We'll get back to you soon.`;
 
   // Send both SMS in parallel (non-blocking relative to each other)
   Promise.all([
-    sendSMS(Configs.ADMIN_PHONE_NUMBER, adminSMS).catch((e) => {
-      console.error('❌ Failed to send SMS to admin:', e.message);
+    sendSMS('+917064055180', adminWhatsAppMessage).catch((e) => {
+      console.error('❌ Failed to send WhatsApp message to admin:', e.message);
     }),
     sendSMS(customerPhoneNumber, customerSMS).catch((e) => {
       console.error('❌ Failed to send SMS to customer:', e.message);

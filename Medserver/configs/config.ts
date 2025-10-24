@@ -1,8 +1,13 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+// Generate a fallback JWT secret if not provided
+const generateFallbackSecret = () => {
+  return 'fallback-jwt-secret-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
 export const Configs = {
-    JWT_SECRET: process.env.JWT_SECRET || '', 
+    JWT_SECRET: process.env.JWT_SECRET || generateFallbackSecret(), 
     PORT: process.env.PORT || '',
     MONGODB_URL: process.env.MONGODB_URL || '',
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID || '',

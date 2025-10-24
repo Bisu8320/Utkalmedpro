@@ -25,9 +25,7 @@
     "lru-cache": "^11.1.0",
     "mongoose": "^8.16.1",
     "nodemailer": "^6.9.8",
-    "twilio": "^5.7.1",
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.0"
+    "twilio": "^5.7.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cd Medserver && npm run dev",
     "start": "cd Medserver && npm run start",
-    "build": "cd Medserver && npm run build",
+    "build": "cd Medserver && npm ci --include=dev && npm run build",
     "clean": "cd Medserver && npm run clean",
     "test": "cd Medserver && npm run test",
     "install-backend": "cd Medserver && npm install",
